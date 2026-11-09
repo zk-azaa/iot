@@ -1,0 +1,258 @@
+import "dotenv/config";
+import Groq from "groq-sdk";
+
+import {
+    controlLamp,
+    controlAllLamps,
+    getHomeStatus
+} from "./tools.js";
+
+
+// ==============================
+// KONEKSI KE AI
+// ==============================
+
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY
+});
+
+
+// ==============================
+// TOOLS YANG BISA DIPAKAI AI
+// ==============================
+
+const tools = [
+    {
+        type: "function",
+        function: {
+            name: "control_lamp",
+            description:
+                "Mengontrol satu lampu di Smart Home. Gunakan untuk menyalakan atau mematikan lampu tertentu.",
+            parameters: {
+                type: "object",
+                properties: {
+                    lamp_id: {
+                        type: "string",
+                        enum: [
+                            "ruang_tamu",
+                            "kamar",
+                            "dapur",
+                            "teras"
+                        ],
+                        description: "ID lampu yang akan dikontrol."
+                    },
+                    state: {
+                        type: "string",
+                        enum: ["on", "off"],
+                        description: "Status lampu."
+                    }
+                },
+                required: ["lamp_id", "state"],
+                additionalProperties: false
+            }
+        }
+    },
+
+    {
+        type: "function",
+        function: {
+            name: "control_all_lamps",
+            description:
+                "Menyalakan atau mematikan seluruh lampu Smart Home.",
+            parameters: {
+                type: "object",
+                properties: {
+                    state: {
+                        type: "string",
+                        enum: ["on", "off"]
+                    }
+                },
+                required: ["state"],
+                additionalProperties: false
+            }
+        }
+    },
+
+    {
+        type: "function",
+        function: {
+            name: "get_home_status",
+            description:
+                "Mengecek status seluruh lampu di Smart Home.",
+            parameters: {
+                type: "object",
+                properties: {},
+                additionalProperties: false
+            }
+        }
+    }
+];
+
+
+// ==============================
+// MENJALANKAN TOOL
+// ==============================
+
+async function executeTool(name, args) {
+
+    switch (name) {
+
+        case "control_lamp":
+            return await controlLamp(
+                args.lamp_id,
+                args.state
+            );
+
+        case "control_all_lamps":
+            return await controlAllLamps(
+                args.state
+            );
+
+        case "get_home_status":
+            return getHomeStatus();
+
+        default:
+            return {
+                success: false,
+                message: "Tool tidak ditemukan."
+            };
+    }
+}
+
+
+// ==============================
+// MENJALANKAN AI AGENT
+// ==============================
+
+export async function runAgent(message) {
+
+    
+const instructions = `
+IDENTITAS:
+Namamu adalah Afna.
+Kamu adalah AI Assistant pribadi yang menjadi pusat kecerdasan sistem Smart Home.
+
+Jika pengguna bertanya siapa namamu, jawab bahwa namamu Afna.
+Jangan pernah memperkenalkan dirimu sebagai Groq, OpenAI, atau AI Agent biasa.
+Kamu adalah Afna, asisten virtual Smart Home.
+
+KEPRIBADIAN:
+- selalu menggunakan nama "afna", contoh "ada yang bisa afna bantu?, afna sudah matikan atau nyalakan."
+- Ramah, cerdas, sopan, dan komunikatif.
+- Gunakan Bahasa Indonesia yang natural dan santai.
+- Bisa diajak ngobrol tentang berbagai topik.
+- Jangan terlalu kaku atau selalu menjawab seperti robot.
+- Sesuaikan gaya bicara dengan konteks percakapan.
+- Gunakan humor ringan jika situasinya sesuai.
+- Jawab pertanyaan dengan jelas dan tidak bertele-tele.
+
+TUGAS UTAMA:
+Kamu membantu pengguna mengelola dan mengontrol Smart Home.
+
+Kemampuan perangkat saat ini:
+1. Mengontrol lampu ruang tamu.
+2. Mengontrol lampu kamar.
+3. Mengontrol lampu dapur.
+4. Mengontrol lampu teras.
+5. Menyalakan seluruh lampu.
+6. Mematikan seluruh lampu.
+7. Mengecek status seluruh lampu.
+
+PENGGUNAAN TOOLS:
+- Gunakan control_lamp untuk mengontrol satu lampu.
+- Gunakan control_all_lamps untuk mengontrol seluruh lampu.
+- Gunakan get_home_status untuk mengecek kondisi lampu.
+- Gunakan tools jika pengguna meminta tindakan atau informasi aktual perangkat.
+- Jangan mengarang status perangkat.
+- Jangan mengatakan perintah berhasil sebelum tool memberikan hasil sukses.
+- Jika tool gagal, jelaskan bahwa perintah belum berhasil.
+
+ATURAN PERCAKAPAN:
+- kamu panggil aku boss
+- Kamu boleh menjawab pertanyaan umum tanpa menggunakan tools.
+- Kamu boleh mengobrol, bercanda, memberikan saran, dan menjelaskan sesuatu.
+- Jangan memaksakan pembicaraan selalu berkaitan dengan Smart Home.
+- Jika pengguna menyebut lampu tanpa menyebut ruangan, tanyakan ruangan yang dimaksud.
+- Pahami maksud pengguna meskipun menggunakan bahasa informal.
+
+IDENTITAS DAN BATASAN:
+- Kamu adalah Afna, asisten pribadi Smart Home.
+- Jangan mengaku memiliki kemampuan yang belum tersedia.
+- Jangan mengarang informasi tentang kondisi rumah.
+- Utamakan keselamatan dan keamanan pengguna.
+
+Selalu gunakan Bahasa Indonesia.
+`;
+
+
+    const messages = [
+        {
+            role: "system",
+            content: instructions
+        },
+        {
+            role: "user",
+            content: message
+        }
+    ];
+
+    // Kirim pesan ke AI
+    let response = await groq.chat.completions.create({
+        model: "openai/gpt-oss-20b",
+        messages,
+        tools,
+        tool_choice: "auto"
+    });
+
+    let assistantMessage = response.choices[0].message;
+
+    // Jika AI ingin menggunakan tool
+    while (assistantMessage.tool_calls) {
+
+        // Masukkan respons AI ke riwayat percakapan
+        messages.push(assistantMessage);
+
+        for (const toolCall of assistantMessage.tool_calls) {
+
+            const functionName =
+                toolCall.function.name;
+
+            const args =
+                JSON.parse(
+                    toolCall.function.arguments
+                );
+
+            console.log(
+                "🤖 AI menjalankan:",
+                functionName,
+                args
+            );
+
+            // Jalankan fungsi asli dari tools.js
+            const result =
+                await executeTool(
+                    functionName,
+                    args
+                );
+
+            // Kirim hasil tool kembali ke AI
+            messages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: JSON.stringify(result)
+            });
+        }
+
+        // AI melanjutkan setelah mendapatkan hasil tool
+        response = await groq.chat.completions.create({
+            model: "openai/gpt-oss-20b",
+            messages,
+            tools,
+            tool_choice: "auto"
+        });
+
+        assistantMessage = response.choices[0].message;
+    }
+
+    return assistantMessage.content;
+}
