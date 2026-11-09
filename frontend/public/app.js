@@ -1,4 +1,3 @@
-const BLYNK_TOKEN = "iSq-7rW22aLSC5cRUKMQIE1HSWKiaE2F";
 const LAMP_NAMES = [
     "Lampu Ruang Tamu",
     "Lampu Kamar",
