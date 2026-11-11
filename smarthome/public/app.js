@@ -269,4 +269,3 @@ function updateDashboard() {
         /* ================= INIT ================= */
 
         updateDashboard();
-        addMessage("bot", "Halo! Saya bisa membantu mengontrol lampu rumah. Coba ketik: \"nyalakan lampu kamar\".");

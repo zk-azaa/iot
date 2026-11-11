@@ -1,4 +1,3 @@
-import "dotenv/config";
 
 const BLYNK_TOKEN = process.env.BLYNK_TOKEN;
 
