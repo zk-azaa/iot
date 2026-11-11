@@ -1,4 +1,4 @@
-import { runAgent } from "../../server/agent.js";
+import { runAgent } from "../server/agent.js";
 
 export default async (request) => {
     // Hanya menerima POST

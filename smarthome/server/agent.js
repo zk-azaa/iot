@@ -1,3 +1,4 @@
+import "dotenv/config";
 import Groq from "groq-sdk";
 
 import {
@@ -124,7 +125,7 @@ async function executeTool(name, args) {
 // ==============================
 
 export async function runAgent(message) {
-    const now = new Date();    
+    const now = new Date()    
 
     const instructions = `
     WAKTU SISTEM SAAT INI:
