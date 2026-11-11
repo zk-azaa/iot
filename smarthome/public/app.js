@@ -204,7 +204,7 @@ function updateDashboard() {
            atau allLamp(state), dan baca status dari array `lamps`.
            ============================================================ */
         async function getAgentReply(text, history) {
-            const response = await fetch("http://localhost:3000/api/agent", {
+            const response = await fetch("https://homebyzk-ai.fly.dev/api/agent", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
