@@ -201,7 +201,7 @@ function updateDashboard() {
            atau allLamp(state), dan baca status dari array `lamps`.
            ============================================================ */
         async function getAgentReply(text, history) {
-            const response = await fetch("/.netlify/agent", {
+            const response = await fetch("/.netlify/functions/agent", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
