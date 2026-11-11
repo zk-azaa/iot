@@ -1,3 +1,5 @@
+const BLYNK_TOKEN = "iSq-7rW22aLSC5cRUKMQIE1HSWKiaE2F";
+
 const LAMP_NAMES = [
     "Lampu Ruang Tamu",
     "Lampu Kamar",
@@ -20,7 +22,8 @@ let lamps = [false, false, false, false];
 ================================ */
 
 async function sendToBlynk(index, state) {
-
+    console.log("sendToBlynk dipanggil");
+    console.log(index, state);
     const pin = LAMP_PINS[index];
 
     if (!pin) {
