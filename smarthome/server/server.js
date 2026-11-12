@@ -11,12 +11,30 @@ import { runAgent } from "./agent.js";
 
 const app = express();
 
+app.use((req, res, next) => {
+    console.log("REQ:", req.method, req.url);
+
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+
+    next();
+});
+
 
 // ==============================
 // MIDDLEWARE
 // ==============================
 
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json());
 
 
@@ -29,10 +47,10 @@ const __dirname = path.dirname(__filename);
 
 
 // Menampilkan dashboard dari folder public
-app.use(
-    express.static(
-        path.join(__dirname, "../public")
-    )
+ app.use(
+     express.static(
+         path.join(__dirname, "../public")
+     )
 );
 
 
@@ -44,7 +62,10 @@ app.post("/api/agent", async (req, res) => {
 
     try {
 
-        const { message } = req.body;
+        const { 
+            message,
+            history = []
+         } = req.body;
 
 
         // Cek pesan
@@ -62,7 +83,10 @@ app.post("/api/agent", async (req, res) => {
 
 
         // Kirim instruksi ke AI Agent
-        const reply = await runAgent(message);
+        const reply = await runAgent(
+            message,
+            history
+        );
 
 
         // Kirim hasil kembali ke dashboard
@@ -96,10 +120,11 @@ app.post("/api/agent", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT,"0.0.0.0",() => {
 
     console.log("");
     console.log("🏠 Smart Home Server berjalan!");
+    console.log(`server listening on 0.0.0.0:${PORT}`);
     console.log(
         `🌐 Buka: http://localhost:${PORT}`
     );

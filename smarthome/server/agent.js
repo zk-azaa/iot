@@ -124,7 +124,8 @@ async function executeTool(name, args) {
 // MENJALANKAN AI AGENT
 // ==============================
 
-export async function runAgent(message) {
+export async function runAgent(
+    message,history = []) {
     const now = new Date()    
 
     const instructions = `
@@ -201,6 +202,7 @@ export async function runAgent(message) {
             role: "system",
             content: instructions
         },
+        ...history,
         {
             role: "user",
             content: message

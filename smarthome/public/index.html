@@ -5,54 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Smart Home Dashboard</title>
-
+    <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
     <div class="container">
-            <header>
-                <h1>🏠 Smart Home</h1>
-                <p>Dashboard Kontrol Lampu Rumah</p>
-            </header>
+        <header>
+            <h1>🏠 Smart Home</h1>
+            <p>Dashboard Kontrol Lampu & Servo Rumah</p>
+        </header>
 
-            <!-- CHATBOX -->
-            <section class="chatbox" aria-label="Asisten Smart Home">
-                <div class="chat-header">
-                    <h3>🤖 Asisten Rumah</h3>
-                    <span>Mode demo</span>
-                </div>
+        <!-- CHATBOX -->
+        <section class="chatbox" aria-label="Asisten Smart Home">
+            <div class="chat-header">
+                <h3>🤖 Asisten Rumah</h3>
+                <span>Mode demo</span>
+            </div>
 
-                <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+            <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
 
-                <div class="chat-input">
-                    <input
-                        type="text"
-                        id="chatInput"
-                        placeholder="Contoh: nyalakan lampu kamar"
-                        autocomplete="off"
-                        aria-label="Pesan untuk asisten"
-                    >
-                    <button id="chatSend" onclick="sendChat()">KIRIM</button>
-                </div>
-            </section>
+            <div class="chat-input">
+                <input
+                    type="text"
+                    id="chatInput"
+                    placeholder="Contoh: nyalakan lampu kamar"
+                    autocomplete="off"
+                    aria-label="Pesan untuk asisten"
+                >
+                <button id="chatSend" onclick="sendChat()">KIRIM</button>
+            </div>
+        </section>
 
-            <div class="summary">
-                <div class="summary-card">
-                    <h2 id="totalLamp">4</h2>
-                    <p>Total Lampu</p>
-                </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h2 id="totalLamp">4</h2>
+                <p>Total Lampu</p>
+            </div>
 
-                <div class="summary-card">
-                    <h2 id="activeLamp">0</h2>
-                    <p>Lampu Menyala</p>
-                </div>
+            <div class="summary-card">
+                <h2 id="activeLamp">0</h2>
+                <p>Lampu Menyala</p>
+            </div>
 
-                <div class="summary-card">
-                    <h2 id="offLamp">4</h2>
-                    <p>Lampu Mati</p>
-                </div>
+            <div class="summary-card">
+                <h2 id="offLamp">4</h2>
+                <p>Lampu Mati</p>
+            </div>
         </div>
 
         <h3 class="section-title">Kontrol Lampu</h3>
@@ -99,6 +99,48 @@
             </button>
         </div>
 
+        <!-- JOYSTICK SERVO -->
+        <h3 class="section-title">Kontrol Servo</h3>
+
+        <section class="servo-card" aria-label="Joystick servo">
+            <div class="pad" id="pad" tabindex="0"
+                 aria-label="Joystick servo. Gunakan tombol panah untuk menggeser.">
+                <span class="arrow up" id="aUp"></span>
+                <span class="arrow down" id="aDown"></span>
+                <span class="arrow left" id="aLeft"></span>
+                <span class="arrow right" id="aRight"></span>
+                <div class="base"></div>
+                <div class="well"></div>
+                <div class="knob" id="knob"></div>
+            </div>
+
+            <div class="servo-panel">
+                <div class="servo-readout">
+                    <div>
+                        <h2 id="sx">90°</h2>
+                        <p>Servo X (horizontal)</p>
+                    </div>
+                    <div>
+                        <h2 id="sy">90°</h2>
+                        <p>Servo Y (vertikal)</p>
+                    </div>
+                </div>
+
+                <label class="servo-field" for="servoMode">Mode joystick</label>
+                <select id="servoMode">
+                    <option value="latch">Servo tetap, knob kembali ke tengah</option>
+                    <option value="pos">Knob ikut tertahan</option>
+                    <option value="spring">Servo ikut kembali ke 90°</option>
+                </select>
+
+                <button class="btn-off" id="servoCenter" onclick="centerServo()">
+                    KEMBALIKAN KE TENGAH (90°)
+                </button>
+
+                <p class="servo-log" id="servoLog">Geser knob untuk menggerakkan servo.</p>
+            </div>
+        </section>
+
         <footer>
             Smart Home Dashboard | HTML CSS JavaScript
         </footer>
@@ -108,6 +150,3 @@
 
 </body>
 </html>
-
-
-
