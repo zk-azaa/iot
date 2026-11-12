@@ -169,7 +169,7 @@ const arrows = {
 const KNOB_MAX = 62;          // jarak maksimum knob (px) dari pusat
 const SERVO_INTERVAL = 120;   // jeda minimum antar kirim ke Blynk (ms)
 const KEY_STEP = 5;           // derajat per tekan tombol panah
-const INVERT_Y = false;       // ubah ke true kalau gerak vertikal terbalik
+const INVERT_Y = true;       // ubah ke true kalau gerak vertikal terbalik
 
 let servo = { x: 90, y: 90 };          // sudut servo saat ini
 let servoSent = { x: null, y: null };  // sudut terakhir yang terkirim
@@ -200,6 +200,8 @@ async function flushServo() {
     const { x, y } = servo;
     servoSent = { x, y };
     lastServoSend = Date.now();
+    console.log("X =", x);
+    console.log("Y =",y);
 
     const url =
         `https://blynk.cloud/external/api/update?token=${BLYNK_TOKEN}` +
