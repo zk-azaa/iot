@@ -199,21 +199,19 @@ async function flushServo() {
 
     const { x, y } = servo;
     servoSent = { x, y };
-    lastServoSend = Date.now();
-    console.log("X =", x);
-    console.log("Y =",y);
-
-    const url =
-        `https://blynk.cloud/external/api/update?token=${BLYNK_TOKEN}` +
-        `&${SERVO_PINS.x}=${x}&${SERVO_PINS.y}=${y}`;
 
     try {
-        const response = await fetch(url);
+        await fetch(
+            `https://blynk.cloud/external/api/update?token=${BLYNK_TOKEN}&V4=${x}`
+        );
 
-        servoLogEl.classList.toggle("error", !response.ok);
-        servoLogEl.textContent = response.ok
-            ? `Terkirim: X=${x}°  Y=${y}°`
-            : `Blynk menolak perintah (status ${response.status})`;
+        await fetch(
+            `https://blynk.cloud/external/api/update?token=${BLYNK_TOKEN}&V5=${y}`
+        );
+
+        servoLogEl.classList.remove("error");
+        servoLogEl.textContent =
+            `Terkirim: X=${x}° Y=${y}°`;
 
     } catch (error) {
         console.error("Gagal mengirim servo ke Blynk:", error);
