@@ -34,6 +34,11 @@ const lamps = [
     }
 ];
 
+const SERVO_PINS = {
+    horizontal: "V4",
+    vertical: "V5"
+};
+
 
 // ==============================
 // TOOL: KONTROL SATU LAMPU
@@ -160,3 +165,103 @@ export function getHomeStatus() {
     };
 }
 
+// ==============================
+// TOOL: KONTROL SERVO WATER CANNON
+// ==============================
+
+const servoPositions = {
+    horizontal: 90,
+    vertical: 90
+};
+
+export async function controlServo(servo_id, angle) {
+
+    const pin = SERVO_PINS[servo_id];
+
+    // Validasi servo dan sudut
+    if (
+        !pin ||
+        !Number.isInteger(angle) ||
+        angle < 0 ||
+        angle > 180
+    ) {
+        return {
+            success: false,
+            message: "Servo atau sudut tidak valid."
+        };
+    }
+
+    // Pastikan token tersedia
+    if (!BLYNK_TOKEN) {
+        return {
+            success: false,
+            message: "BLYNK_TOKEN belum dikonfigurasi."
+        };
+    }
+
+    const url = new URL(
+        "https://blynk.cloud/external/api/update"
+    );
+
+    url.searchParams.set("token", BLYNK_TOKEN);
+    url.searchParams.set(pin, angle);
+
+    try {
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(
+                `Blynk error ${response.status}: ${await response.text()}`
+            );
+        }
+
+        servoPositions[servo_id] = angle;
+
+        return {
+            success: true,
+            servo: servo_id,
+            pin: pin,
+            angle: angle,
+            message: `Perintah servo ${servo_id} sebesar ${angle} derajat berhasil dikirim ke Blynk.`
+        };
+
+    } catch (error) {
+
+        console.error("Gagal mengontrol servo:", error);
+
+        return {
+            success: false,
+            message: `Gagal mengirim perintah servo ${servo_id} ke Blynk.`
+        };
+    }
+
+    
+}
+// ==============================
+    // TOOL: KONTROL KEDUA SERVO SEKALIGUS
+    // ==============================
+
+    export async function controlWaterCannon(
+        horizontal_angle,
+        vertical_angle
+    ) {
+
+        const results = await Promise.all([
+            controlServo("horizontal", horizontal_angle),
+            controlServo("vertical", vertical_angle)
+        ]);
+
+        const success = results.every(
+            result => result.success
+        );
+
+        return {
+            success,
+            horizontal: results[0],
+            vertical: results[1],
+            message: success
+                ? "Perintah kedua servo berhasil dikirim ke Blynk."
+                : "Sebagian atau seluruh perintah servo gagal dikirim."
+        };
+    }

@@ -4,7 +4,9 @@ import Groq from "groq-sdk";
 import {
     controlLamp,
     controlAllLamps,
-    getHomeStatus
+    getHomeStatus,
+    controlServo,
+    controlWaterCannon
 } from "./tools.js";
 
 
@@ -85,6 +87,35 @@ const tools = [
                 additionalProperties: false
             }
         }
+    },
+
+    {
+        type: "function",
+        function: {
+            name: "control_servo",
+            description:
+                "Mengontrol servo water cannon. Gunakan horizontal untuk mengatur arah kiri dan kanan, serta vertical untuk mengatur arah atas dan bawah.",
+            parameters: {
+                type: "object",
+                properties: {
+                    servo_id: {
+                        type: "string",
+                        enum: ["horizontal", "vertical"],
+                        description:
+                            "Pilih horizontal atau vertical."
+                    },
+                    angle: {
+                        type: "integer",
+                        minimum: 0,
+                        maximum: 180,
+                        description:
+                            "Sudut servo dalam derajat."
+                    }
+                },
+                required: ["servo_id", "angle"],
+                additionalProperties: false
+            }
+        }
     }
 ];
 
@@ -110,6 +141,12 @@ async function executeTool(name, args) {
 
         case "get_home_status":
             return getHomeStatus();
+
+        case "control_servo":
+            return await controlServo(
+                args.servo_id,
+                args.angle
+            );
 
         default:
             return {
@@ -169,8 +206,10 @@ export async function runAgent(
     5. Menyalakan seluruh lampu.
     6. Mematikan seluruh lampu.
     7. Mengecek status seluruh lampu.
+    8. Mengontrol servo horizontal water cannon.
+    9. Mengontrol servo vertikal water cannon.
+    10. Mengatur sudut servo dari 0 sampai 180 derajat.
 
-    PENGGUNAAN TOOLS:
     - Gunakan control_lamp untuk mengontrol satu lampu.
     - Gunakan control_all_lamps untuk mengontrol seluruh lampu.
     - Gunakan get_home_status untuk mengecek kondisi lampu.
@@ -178,6 +217,13 @@ export async function runAgent(
     - Jangan mengarang status perangkat.
     - Jangan mengatakan perintah berhasil sebelum tool memberikan hasil sukses.
     - Jika tool gagal, jelaskan bahwa perintah belum berhasil.
+
+    - Gunakan control_servo untuk menggerakkan servo water cannon.
+    - Servo horizontal digunakan untuk mengatur arah kiri dan kanan.
+    - Servo vertical digunakan untuk mengatur arah atas dan bawah.
+    - Jangan mengklaim servo bergerak secara fisik hanya berdasarkan respons Blynk.
+    - Jika pengguna menyebut arah tanpa sudut, tentukan sudut secara wajar berdasarkan posisi yang diketahui.
+    - Jika posisi awal tidak diketahui, tanyakan atau jelaskan asumsi sudut yang digunakan.
 
     ATURAN PERCAKAPAN:
     - kamu panggil aku boss
