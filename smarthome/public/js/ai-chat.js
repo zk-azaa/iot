@@ -256,7 +256,7 @@
     typing.querySelector(".message").classList.add("typing-message");
 
     try {
-      const res = await fetch("http://localhost:3000/api/agent", {
+      const res = await fetch("/api/agent", { //http://localhost:3000/api/agent
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, history: contextForServer() }),
@@ -358,7 +358,7 @@ if (!afnaAwake) {
       try {
 
         const res = await fetch(
-          "http://localhost:3000/api/agent",
+          "/api/agent", //http://localhost:3000/api/agent
           {
             method: "POST",
             headers: {
