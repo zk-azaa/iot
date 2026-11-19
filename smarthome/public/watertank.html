@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💧 Water Tank | Smart Home</title>
+    <link rel="stylesheet" href="css/feature.css" />
+  </head>
+  <body>
+    <main class="feature-shell">
+      <header class="topbar">
+        <div class="brand">
+          ⌂ Smart Home<small>Control · Monitor · Automate</small>
+        </div>
+        <div class="top-actions">
+          <span class="pill">● Dashboard</span
+          ><a class="backlink" href="index.html">← Halaman Utama</a>
+        </div>
+      </header>
+      <div class="page-title">
+        <div>
+          <h1>💧 Water Tank</h1>
+          <p>Pantau kapasitas air dan kendalikan pompa pengisian.</p>
+        </div>
+        <span class="pill">Mode dashboard</span>
+      </div>
+      <section class="grid">
+        <article class="panel">
+          <h2>Monitoring Tangki</h2>
+          <p class="muted">Contoh tampilan level tangki (simulasi).</p>
+          <div class="tank-ring" id="tankRing">
+            <div>
+              <strong id="tankPercent">72%</strong
+              ><small id="tankLiters">720 L / 1.000 L</small>
+            </div>
+          </div>
+          <input
+            style="width: 100%"
+            type="range"
+            min="0"
+            max="100"
+            value="72"
+            id="tankLevel"
+          />
+          <div class="row">
+            <span class="muted">Kosong</span
+            ><b id="tankStatus" class="status">Normal</b
+            ><span class="muted">Penuh</span>
+          </div>
+        </article>
+        <article class="panel stack">
+          <h2>Kontrol Pompa</h2>
+          <div class="row">
+            <div>
+              <b>Pompa air</b>
+              <p class="muted" id="pumpStatus">OFF</p>
+            </div>
+            <div class="row">
+              <button class="btn primary" id="pumpOn">ON</button
+              ><button class="btn" id="pumpOff">OFF</button>
+            </div>
+          </div>
+          <hr style="border-color: #29415f" />
+          <div class="row">
+            <div>
+              <b>Otomatisasi</b>
+              <p class="muted">Kontrol pompa berdasarkan level air.</p>
+            </div>
+            <button
+              class="switch"
+              id="tankAuto"
+              role="switch"
+              aria-checked="false"
+            ></button>
+          </div>
+          <label
+            >Batas nyala pompa (%)
+            <input
+              id="tankLow"
+              type="number"
+              min="1"
+              max="99"
+              value="20" /></label
+          ><label
+            >Batas mati pompa (%)
+            <input id="tankHigh" type="number" min="2" max="100" value="90"
+          /></label>
+          <p class="muted" id="tankAutoStatus">Otomatisasi nonaktif.</p>
+        </article>
+      </section>
+      <p class="note" style="margin-top: 16px">
+        Level tangki saat ini adalah simulasi karena file project belum berisi
+        konfigurasi sensor ultrasonik atau pin Blynk untuk pompa. Jangan gunakan
+        simulasi ini sebagai pembacaan level air nyata.
+      </p>
+      <p class="muted" style="text-align: center; margin: 24px 0 5px">
+        Smart Home Dashboard · Halaman fitur terpisah
+      </p>
+    </main>
+    <script src="js/config.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/ai-chat.js"></script>
+  </body>
+</html>

@@ -175,13 +175,18 @@ export async function runAgent(
     - Anggap informasi waktu di atas adalah benar.
     - Jika pengguna menanyakan jam, tanggal, hari, atau waktu saat ini, gunakan informasi waktu di atas.
     - Jangan menebak tanggal atau jam dari pengetahuanmu sendiri.
+    - Balas menggunakan teks biasa.
+    - Jangan gunakan markdown.
+    - Jangan gunakan **, *, #, _, atau tanda format lainnya.
+    - Jangan gunakan blok kode kecuali diminta.
 
 
     IDENTITAS:
     Namamu adalah Afna.
+    nama afna yang artinya Artificial Friend for Network Automation
     Kamu adalah AI Assistant pribadi yang menjadi pusat kecerdasan sistem Smart Home.
 
-    Jika pengguna bertanya siapa namamu, jawab bahwa namamu Afna.
+    Jika pengguna bertanya siapa namamu, jawab bahwa namamu Afna,Artificial Friend for Network Automation(A.F.N.A).
     Jangan pernah memperkenalkan dirimu sebagai Groq, OpenAI, atau AI Agent biasa.
     Kamu adalah Afna, asisten virtual Smart Home.
 
@@ -314,5 +319,15 @@ export async function runAgent(
         assistantMessage = response.choices[0].message;
     }
 
-    return assistantMessage.content;
+    // let cleanResponse = assistantMessage.content || "";
+
+    // cleanResponse = cleanResponse
+    // .replace(/\*\*/g, "")
+    // .replace(/\*/g, "")
+    // .replace(/#/g, "")
+    // .replace(/`/g, "")
+    // .replace(/__/g, "");
+
+    return cleanResponse;
+
 }

@@ -383,8 +383,8 @@ chatInput.addEventListener("keydown", (e) => {
    array `lamps` / objek `servo`.
    ============================================================ */
 async function getAgentReply(text, history) {
-    const response = await fetch("https://homebyzk-ai.fly.dev/api/agent", {
-    //const response = await fetch("http://localhost:3000/api/agent", {
+   // const response = await fetch("https://homebyzk-ai.fly.dev/api/agent", {
+    const response = await fetch("http://localhost:3000/api/agent", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

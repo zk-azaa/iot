@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📹 CCTV | Smart Home</title>
+    <link rel="stylesheet" href="css/feature.css" />
+  </head>
+  <body>
+    <main class="feature-shell">
+      <header class="topbar">
+        <div class="brand">
+          ⌂ Smart Home<small>Control · Monitor · Automate</small>
+        </div>
+        <div class="top-actions">
+          <span class="pill">● Dashboard</span
+          ><a class="backlink" href="index.html">← Halaman Utama</a>
+        </div>
+      </header>
+      <div class="page-title">
+        <div>
+          <h1>📹 CCTV</h1>
+          <p>Pantau kamera keamanan rumah dalam satu halaman.</p>
+        </div>
+        <span class="pill">Mode dashboard</span>
+      </div>
+      <section class="grid">
+        <article class="panel" style="grid-column: 1/-1">
+          <div class="row">
+            <div>
+              <h2>Monitor CCTV</h2>
+              <p class="muted">Tampilan kamera keamanan.</p>
+            </div>
+            <select id="cctvLayout">
+              <option value="2">2 × 2</option>
+              <option value="1">1 × 1</option>
+            </select>
+          </div>
+          <div class="cctv-grid" id="cctvGrid" style="margin-top: 15px">
+            <div class="cctv-tile">
+              CAM 01 · STREAM BELUM DIATUR<small>CH1 · Halaman Depan</small>
+            </div>
+            <div class="cctv-tile">
+              CAM 02 · STREAM BELUM DIATUR<small>CH2 · Ruang Tamu</small>
+            </div>
+            <div class="cctv-tile">
+              CAM 03 · STREAM BELUM DIATUR<small>CH3 · Koridor</small>
+            </div>
+            <div class="cctv-tile">
+              CAM 04 · STREAM BELUM DIATUR<small>CH4 · Halaman Belakang</small>
+            </div>
+          </div>
+        </article>
+        <article class="panel">
+          <h2>Status Kamera</h2>
+          <p class="muted">Belum ada URL stream kamera pada source project.</p>
+          <p class="status" style="margin-top: 12px">
+            ● UI siap · Menunggu konfigurasi stream
+          </p>
+        </article>
+      </section>
+      <p class="note" style="margin-top: 16px">
+        Masukkan URL stream masing-masing kamera ke bagian CAMERAS di config.js.
+        Halaman ini belum menampilkan rekaman langsung tanpa URL stream yang
+        valid.
+      </p>
+      <p class="muted" style="text-align: center; margin: 24px 0 5px">
+        Smart Home Dashboard · Halaman fitur terpisah
+      </p>
+    </main>
+    <script src="js/config.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/ai-chat.js"></script>
+  </body>
+</html>

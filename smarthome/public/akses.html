@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔐 Akses Rumah | Smart Home</title>
+    <link rel="stylesheet" href="css/feature.css" />
+  </head>
+  <body>
+    <main class="feature-shell">
+      <header class="topbar">
+        <div class="brand">
+          ⌂ Smart Home<small>Control · Monitor · Automate</small>
+        </div>
+        <div class="top-actions">
+          <span class="pill">● Dashboard</span
+          ><a class="backlink" href="index.html">← Halaman Utama</a>
+        </div>
+      </header>
+      <div class="page-title">
+        <div>
+          <h1>🔐 Akses Rumah</h1>
+          <p>Kelola kunci gerbang dan pintu serta status akses RFID.</p>
+        </div>
+        <span class="pill">Mode dashboard</span>
+      </div>
+      <section class="panel">
+        <div class="row">
+          <div>
+            <h2>Kontrol Pintu & Gerbang</h2>
+            <p class="muted">Status di bawah adalah simulasi antarmuka.</p>
+          </div>
+          <span class="status">● Dashboard siap</span>
+        </div>
+        <div class="access-grid" id="accessGrid" style="margin-top: 16px">
+          <div class="access-card" data-door="Gerbang Depan">
+            <div style="font-size: 26px">🚧</div>
+            <h3>Gerbang Depan</h3>
+            <p class="lockstate">TERKUNCI</p>
+            <button class="btn primary lock-btn">UNLOCK</button>
+          </div>
+          <div class="access-card" data-door="Pintu Utama">
+            <div style="font-size: 26px">🚪</div>
+            <h3>Pintu Utama</h3>
+            <p class="lockstate">TERKUNCI</p>
+            <button class="btn primary lock-btn">UNLOCK</button>
+          </div>
+          <div class="access-card" data-door="Pintu Kamar">
+            <div style="font-size: 26px">🚪</div>
+            <h3>Pintu Kamar</h3>
+            <p class="lockstate">TERKUNCI</p>
+            <button class="btn primary lock-btn">UNLOCK</button>
+          </div>
+          <div class="access-card" data-door="Pintu Belakang">
+            <div style="font-size: 26px">🚪</div>
+            <h3>Pintu Belakang</h3>
+            <p class="lockstate">TERKUNCI</p>
+            <button class="btn primary lock-btn">UNLOCK</button>
+          </div>
+        </div>
+      </section>
+      <section class="grid" style="margin-top: 16px">
+        <article class="panel">
+          <div class="row">
+            <div>
+              <h2>Mode Kunci RFID</h2>
+              <p class="muted">Atur apakah kartu RFID boleh membuka akses.</p>
+            </div>
+            <button
+              class="switch"
+              id="rfidLockMode"
+              role="switch"
+              aria-checked="true"
+            ></button>
+          </div>
+          <p id="rfidModeText" class="status" style="margin-top: 14px">
+            RFID diblokir oleh mode kunci.
+          </p>
+        </article>
+        <article class="panel">
+          <h2>Riwayat Akses (Demo)</h2>
+          <p class="muted" id="accessLog">Belum ada aktivitas pada sesi ini.</p>
+          <div class="formrow">
+            <button class="btn" id="rfidTest">Simulasikan scan RFID</button
+            ><button class="btn danger" id="lockAll">LOCK SEMUA</button>
+          </div>
+        </article>
+      </section>
+      <p class="note" style="margin-top: 16px">
+        Penting: tombol LOCK pada halaman ini hanya mengubah status antarmuka.
+        Integrasi kunci elektrik/solenoid dan pembaca RFID belum ada pada source
+        yang diunggah. Pastikan selalu ada mekanisme keluar darurat secara
+        manual dan jangan mengunci jalur evakuasi.
+      </p>
+      <p class="muted" style="text-align: center; margin: 24px 0 5px">
+        Smart Home Dashboard · Halaman fitur terpisah
+      </p>
+    </main>
+    <script src="js/config.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/ai-chat.js"></script>
+  </body>
+</html>

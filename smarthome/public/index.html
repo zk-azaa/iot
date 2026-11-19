@@ -1,152 +1,165 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c1425" />
+    <title>Smart Home</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="scene"></div>
+    <div class="shade"></div>
 
-    <title>Smart Home Dashboard</title>
-    <link rel="icon" href="/favicon.ico">
-    <link rel="stylesheet" href="style.css">
-</head>
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Smart Home - Home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <path d="M5 22.5 24 6l19 16.5M10 20v22h28V20M19 42V28h10v14" />
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>Smart Home</strong>
+          <small>Control · Monitor · Automate</small>
+        </span>
+      </a>
 
-<body>
-
-    <div class="container">
-        <header>
-            <h1>🏠 Smart Home</h1>
-            <p>Dashboard Kontrol Lampu & Servo Rumah</p>
-        </header>
-
-        <!-- CHATBOX -->
-        <section class="chatbox" aria-label="Asisten Smart Home">
-            <div class="chat-header">
-                <h3>🤖 Asisten Rumah</h3>
-                <span>Mode demo</span>
-            </div>
-
-            <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
-
-            <div class="chat-input">
-                <input
-                    type="text"
-                    id="chatInput"
-                    placeholder="Contoh: nyalakan lampu kamar"
-                    autocomplete="off"
-                    aria-label="Pesan untuk asisten"
-                >
-                <button id="chatSend" onclick="sendChat()">KIRIM</button>
-            </div>
-        </section>
-
-        <div class="summary">
-            <div class="summary-card">
-                <h2 id="totalLamp">4</h2>
-                <p>Total Lampu</p>
-            </div>
-
-            <div class="summary-card">
-                <h2 id="activeLamp">0</h2>
-                <p>Lampu Menyala</p>
-            </div>
-
-            <div class="summary-card">
-                <h2 id="offLamp">4</h2>
-                <p>Lampu Mati</p>
-            </div>
-        </div>
-
-        <h3 class="section-title">Kontrol Lampu</h3>
-
-        <div class="lamp-grid">
-
-            <div class="lamp-card" id="card0">
-                <div class="lamp-icon">💡</div>
-                <h3>Lampu Ruang Tamu</h3>
-                <p class="status" id="status0">OFF</p>
-                <button class="switch" onclick="toggleLamp(0)">NYALAKAN</button>
-            </div>
-
-            <div class="lamp-card" id="card1">
-                <div class="lamp-icon">💡</div>
-                <h3>Lampu Kamar</h3>
-                <p class="status" id="status1">OFF</p>
-                <button class="switch" onclick="toggleLamp(1)">NYALAKAN</button>
-            </div>
-
-            <div class="lamp-card" id="card2">
-                <div class="lamp-icon">💡</div>
-                <h3>Lampu Dapur</h3>
-                <p class="status" id="status2">OFF</p>
-                <button class="switch" onclick="toggleLamp(2)">NYALAKAN</button>
-            </div>
-
-            <div class="lamp-card" id="card3">
-                <div class="lamp-icon">💡</div>
-                <h3>Lampu Teras</h3>
-                <p class="status" id="status3">OFF</p>
-                <button class="switch" onclick="toggleLamp(3)">NYALAKAN</button>
-            </div>
-
-        </div>
-
-        <div class="controls">
-            <button class="btn-on" onclick="allLamp(true)">
-                NYALAKAN SEMUA
+      <div class="top-actions">
+        <span class="connection"><i></i> Online</span>
+        <span class="top-divider"></span>
+        <time id="dateTime">Memuat waktu...</time>
+        <div class="settings-wrap">
+          <button
+            class="settings-link"
+            id="settingsToggle"
+            type="button"
+            aria-label="Buka menu pengaturan"
+            aria-expanded="false"
+            aria-controls="settingsMenu"
+            title="Pengaturan"
+          >
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6ZM19.4 13.5l1.1.9-1.5 2.6-1.4-.5a7.7 7.7 0 0 1-1.5.9l-.2 1.5h-3l-.3-1.5a7.7 7.7 0 0 1-1.5-.9l-1.4.5-1.5-2.6 1.1-.9a7 7 0 0 1 0-1.8l-1.1-.9 1.5-2.6 1.4.5a7.7 7.7 0 0 1 1.5-.9l.3-1.5h3l.2 1.5a7.7 7.7 0 0 1 1.5.9l1.4-.5 1.5 2.6-1.1.9a7 7 0 0 1 0 1.8Z"
+              />
+            </svg>
+          </button>
+          <div class="settings-menu" id="settingsMenu" hidden>
+            <div class="settings-menu-heading">Pengaturan</div>
+            <a class="settings-option" href="profile.html">
+              <span class="option-icon">♙</span>
+              <span
+                ><strong>Profil Akun</strong
+                ><small>Informasi akun Anda</small></span
+              >
+            </a>
+            <a class="settings-option" href="system-settings.html">
+              <span class="option-icon">⚙</span>
+              <span
+                ><strong>Pengaturan Sistem</strong
+                ><small>Konfigurasi Smart Home</small></span
+              >
+            </a>
+            <div class="settings-menu-divider"></div>
+            <button
+              class="settings-option logout-option"
+              id="logoutButton"
+              type="button"
+            >
+              <span class="option-icon">↪</span>
+              <span
+                ><strong>Log Out</strong><small>Keluar dari akun</small></span
+              >
             </button>
-
-            <button class="btn-off" onclick="allLamp(false)">
-                MATIKAN SEMUA
-            </button>
+          </div>
         </div>
+      </div>
+    </header>
 
-        <!-- JOYSTICK SERVO -->
-        <h3 class="section-title">Kontrol Servo</h3>
+    <main class="home-layout">
+      <section class="radial-section" aria-label="Menu navigasi">
+        <nav class="radial-menu">
+          <div class="orbit orbit-one"></div>
+          <a class="menu-item item-lamp" href="lampu.html">
+            <span class="menu-icon"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M9 18h6m-5 3h4m-2-20a7 7 0 0 0-4 12.7c.8.6 1 1.2 1 2.3h6c0-1.1.2-1.7 1-2.3A7 7 0 0 0 12 1Z"
+                /></svg
+            ></span>
+            <span>Lampu</span>
+          </a>
+          <a class="menu-item item-water" href="watertank.html">
+            <span class="menu-icon"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2.5S5.5 10 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 10 12 2.5 12 2.5Z"
+                /></svg
+            ></span>
+            <span>Water Tank</span>
+          </a>
+          <a class="menu-item item-cannon" href="watercannon.html">
+            <span class="menu-icon"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="m3 10 11-4 2 5-11 4-2-5Zm11-4 2-3m1 10 3 1m-2-5 3-1M8 15l-1 6m-3 0h9"
+                /></svg
+            ></span>
+            <span>Watercanon</span>
+          </a>
+          <a class="menu-item item-cctv" href="cctv.html">
+            <span class="menu-icon"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M3 8h12l4 3v5H7l-4-3V8Zm12 0 2-3h4v5m-11 6-2 5m8-5 2 5M8 11h.01"
+                /></svg
+            ></span>
+            <span>CCTV</span>
+          </a>
+          <a class="menu-item item-access" href="akses.html">
+            <span class="menu-icon"
+              ><svg viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" />
+                <rect x="9" y="10" width="6" height="5" rx="1" />
+                <path d="M10.5 10V8.5a1.5 1.5 0 0 1 3 0V10" /></svg
+            ></span>
+            <span>Akses</span>
+          </a>
+          <a
+            class="menu-item item-home active"
+            href="index.html"
+            aria-current="page"
+          >
+            <span class="menu-icon"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z"
+                /></svg
+            ></span>
+            <span>Home</span>
+          </a>
+        </nav>
+      </section>
 
-        <section class="servo-card" aria-label="Joystick servo">
-            <div class="pad" id="pad" tabindex="0"
-                 aria-label="Joystick servo. Gunakan tombol panah untuk menggeser.">
-                <span class="arrow up" id="aUp"></span>
-                <span class="arrow down" id="aDown"></span>
-                <span class="arrow left" id="aLeft"></span>
-                <span class="arrow right" id="aRight"></span>
-                <div class="base"></div>
-                <div class="well"></div>
-                <div class="knob" id="knob"></div>
-            </div>
+      <section class="welcome">
+        <p class="eyebrow">Selamat Datang di</p>
+        <h1>Smart <span>Home!</span></h1>
+        <p class="welcome-text">
+          Kontrol rumah pintar Anda<br class="desktop-break" />
+          dengan mudah dan modern.
+        </p>
+        <div class="gold-line"></div>
+        <p class="welcome-hint">Semua perangkat rumah dalam satu kendali.</p>
+      </section>
+    </main>
 
-            <div class="servo-panel">
-                <div class="servo-readout">
-                    <div>
-                        <h2 id="sx">90°</h2>
-                        <p>Servo X (horizontal)</p>
-                    </div>
-                    <div>
-                        <h2 id="sy">90°</h2>
-                        <p>Servo Y (vertikal)</p>
-                    </div>
-                </div>
-
-                <label class="servo-field" for="servoMode">Mode joystick</label>
-                <select id="servoMode">
-                    <option value="latch">Servo tetap, knob kembali ke tengah</option>
-                    <option value="pos">Knob ikut tertahan</option>
-                    <option value="spring">Servo ikut kembali ke 90°</option>
-                </select>
-
-                <button class="btn-off" id="servoCenter" onclick="centerServo()">
-                    KEMBALIKAN KE TENGAH (90°)
-                </button>
-
-                <p class="servo-log" id="servoLog">Geser knob untuk menggerakkan servo.</p>
-            </div>
-        </section>
-
-        <footer>
-            Smart Home Dashboard | HTML CSS JavaScript
-        </footer>
-    </div>
-
-    <script src="app.js"></script>
-
-</body>
+    <script src="js/home.js"></script>
+    <script src="js/ai-chat.js"></script>
+  </body>
 </html>

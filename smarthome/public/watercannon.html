@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎯 Water Cannon | Smart Home</title>
+    <link rel="stylesheet" href="css/feature.css" />
+  </head>
+  <body>
+    <main class="feature-shell">
+      <header class="topbar">
+        <div class="brand">
+          ⌂ Smart Home<small>Control · Monitor · Automate</small>
+        </div>
+        <div class="top-actions">
+          <span class="pill">● Dashboard</span
+          ><a class="backlink" href="index.html">← Halaman Utama</a>
+        </div>
+      </header>
+      <div class="page-title">
+        <div>
+          <h1>🎯 Water Cannon</h1>
+          <p>Arahkan meriam menggunakan joystick dan kontrol aliran air.</p>
+        </div>
+        <span class="pill">Mode dashboard</span>
+      </div>
+      <section class="grid">
+        <article class="panel">
+          <div class="row">
+            <div>
+              <h2>Kamera Water Cannon</h2>
+              <p class="muted">Tampilan kamera / target bidik.</p>
+            </div>
+            <span class="status">● Menunggu stream</span>
+          </div>
+          <div class="camera" id="cannonCamera">
+            <span class="camlabel">LIVE PREVIEW · STREAM BELUM DIATUR</span
+            ><span class="crosshair">＋</span>
+          </div>
+          <small class="hint"
+            >Tambahkan URL kamera pada config.js untuk menampilkan video
+            aktual.</small
+          >
+        </article>
+        <article class="panel">
+          <h2>Joystick Arah Meriam</h2>
+          <p class="muted">Geser knob untuk mengubah sudut servo.</p>
+          <div class="joystick" id="joystick">
+            <span class="joy-arrow up">↑</span
+            ><span class="joy-arrow down">↓</span
+            ><span class="joy-arrow left">←</span
+            ><span class="joy-arrow right">→</span>
+            <div class="joy-knob" id="joyKnob"></div>
+          </div>
+          <div class="row">
+            <span>Servo X: <b id="servoX">90°</b></span
+            ><span>Servo Y: <b id="servoY">90°</b></span>
+          </div>
+          <button
+            class="btn"
+            id="centerCannon"
+            style="width: 100%; margin-top: 12px"
+          >
+            Kembalikan ke tengah
+          </button>
+        </article>
+        <article class="panel">
+          <h2>Kontrol Sistem</h2>
+          <div class="row" style="margin: 14px 0">
+            <div>
+              <b>Aliran air</b>
+              <p class="muted" id="waterState">OFF</p>
+            </div>
+            <button class="btn primary" id="waterToggle">NYALAKAN AIR</button>
+          </div>
+          <div class="row">
+            <div>
+              <b>Otomatisasi</b>
+              <p class="muted">Mode kontrol otomatis.</p>
+            </div>
+            <button
+              class="switch"
+              id="cannonAuto"
+              role="switch"
+              aria-checked="false"
+            ></button>
+          </div>
+          <p class="muted" id="cannonAutoText" style="margin-top: 10px">
+            Otomatisasi nonaktif.
+          </p>
+        </article>
+      </section>
+      <p class="note" style="margin-top: 16px">
+        Joystick menggunakan konfigurasi servo Blynk V4/V5 dari project. Tombol
+        air dan otomatisasi masih berupa kontrol UI sampai pin relay dan aturan
+        otomatisasi ditentukan. Uji meriam tanpa tekanan air terlebih dahulu.
+      </p>
+      <p class="muted" style="text-align: center; margin: 24px 0 5px">
+        Smart Home Dashboard · Halaman fitur terpisah
+      </p>
+    </main>
+    <script src="js/config.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/ai-chat.js"></script>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💡 Kontrol Lampu | Smart Home</title>
+    <link rel="stylesheet" href="css/feature.css" />
+  </head>
+  <body>
+    <main class="feature-shell">
+      <header class="topbar">
+        <div class="brand">
+          ⌂ Smart Home<small>Control · Monitor · Automate</small>
+        </div>
+        <div class="top-actions">
+          <span class="pill">● Dashboard</span
+          ><a class="backlink" href="index.html">← Halaman Utama</a>
+        </div>
+      </header>
+      <div class="page-title">
+        <div>
+          <h1>💡 Kontrol Lampu</h1>
+          <p>Atur lampu rumah dan jadwalkan otomatisasi.</p>
+        </div>
+        <span class="pill">Mode dashboard</span>
+      </div>
+      <section class="grid">
+        <article class="panel stack">
+          <div>
+            <h2>Status Lampu Utama</h2>
+            <p class="muted">Kontrol seluruh lampu yang terdaftar.</p>
+          </div>
+          <div class="row">
+            <div>
+              <div class="stat" id="lampMasterText">OFF</div>
+              <span class="muted">Status master</span>
+            </div>
+            <div class="stack">
+              <button class="btn primary" id="lampMasterOn">
+                NYALAKAN SEMUA</button
+              ><button class="btn" id="lampMasterOff">MATIKAN SEMUA</button>
+            </div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="row">
+            <div>
+              <h2>Jadwal Otomatis</h2>
+              <p class="muted">Pilih waktu dan hari untuk jadwal lampu.</p>
+            </div>
+            <button
+              class="switch"
+              id="scheduleToggle"
+              role="switch"
+              aria-checked="false"
+              aria-label="Aktifkan jadwal"
+            ></button>
+          </div>
+          <div class="formrow">
+            <label
+              >Waktu mulai
+              <input type="time" id="startTime" value="18:00" /></label
+            ><label
+              >Waktu selesai <input type="time" id="endTime" value="06:00"
+            /></label>
+          </div>
+          <div class="days" id="days">
+            <button class="day selected">Sen</button
+            ><button class="day selected">Sel</button
+            ><button class="day selected">Rab</button
+            ><button class="day selected">Kam</button
+            ><button class="day selected">Jum</button
+            ><button class="day">Sab</button><button class="day">Min</button>
+          </div>
+          <button class="btn primary" id="saveSchedule">Simpan Jadwal</button>
+          <p class="muted" id="scheduleStatus" style="margin-top: 10px">
+            Jadwal belum diaktifkan.
+          </p>
+        </article>
+        <article class="panel" style="grid-column: 1/-1">
+          <h2>Daftar Lampu</h2>
+          <p class="muted">
+            Status tombol disimpan lokal pada browser. Integrasi pin perangkat
+            perlu disesuaikan.
+          </p>
+          <div class="grid" id="lampList" style="margin-top: 15px">
+            <div class="row">
+              <div>
+                <b>Ruang Tamu</b>
+                <p class="muted">Blynk V0</p>
+              </div>
+              <button
+                class="switch lamp-switch"
+                data-index="0"
+                role="switch"
+                aria-checked="false"
+              ></button>
+            </div>
+            <div class="row">
+              <div>
+                <b>Kamar</b>
+                <p class="muted">Blynk V1</p>
+              </div>
+              <button
+                class="switch lamp-switch"
+                data-index="1"
+                role="switch"
+                aria-checked="false"
+              ></button>
+            </div>
+            <div class="row">
+              <div>
+                <b>Dapur</b>
+                <p class="muted">Pin belum dikonfigurasi</p>
+              </div>
+              <button
+                class="switch lamp-switch"
+                data-index="2"
+                role="switch"
+                aria-checked="false"
+              ></button>
+            </div>
+            <div class="row">
+              <div>
+                <b>Teras</b>
+                <p class="muted">Pin belum dikonfigurasi</p>
+              </div>
+              <button
+                class="switch lamp-switch"
+                data-index="3"
+                role="switch"
+                aria-checked="false"
+              ></button>
+            </div>
+          </div>
+        </article>
+      </section>
+      <p class="muted" style="text-align: center; margin: 24px 0 5px">
+        Smart Home Dashboard · Halaman fitur terpisah
+      </p>
+    </main>
+    <script src="js/config.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/ai-chat.js"></script>
+  </body>
+</html>
