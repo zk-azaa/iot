@@ -15,8 +15,13 @@ import {
 // ==============================
 
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY
+  apiKey: process.env.GROQ_API_KEY
 });
+
+console.log(
+  "GROQ KEY:",
+  process.env.GROQ_API_KEY ? "ADA" : "KOSONG"
+);
 
 
 // ==============================
@@ -328,6 +333,5 @@ export async function runAgent(
     // .replace(/`/g, "")
     // .replace(/__/g, "");
 
-    return cleanResponse;
-
+    return assistantMessage.content || "";
 }
