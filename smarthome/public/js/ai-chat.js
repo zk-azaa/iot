@@ -358,7 +358,7 @@ if (!afnaAwake) {
       try {
 
         const res = await fetch(
-          "/api/agent", //http://localhost:3000/api/agent
+          "/api/agent", //
           {
             method: "POST",
             headers: {

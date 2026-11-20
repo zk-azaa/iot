@@ -12,27 +12,36 @@
   const isOn = (el) => el.getAttribute("aria-checked") === "true";
   const setSwitch = (el, on) => el?.setAttribute("aria-checked", String(!!on));
 
-  /** Kirim nilai ke virtual pin Blynk. Pin kosong = tidak ada mapping, tidak dikirim. */
-  const BLYNK_TOKEN = "iSq-7rW22aLSC5cRUKMQIE1HSWKiaE2F";
-
-  async function blynkWrite(pin, value) {
-    if (!pin) return false;
+  async function deviceCommand(type, payload = {}) {
 
     try {
-      const url =
-        `https://blynk.cloud/external/api/update?token=${BLYNK_TOKEN}&${pin}=${value}`;
 
-      const res = await fetch(url);
+      const response = await fetch("/api/device", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          type,
+          ...payload
+        })
+      });
 
-      console.log(`SEND ${pin}=${value} STATUS=${res.status}`);
+      return await response.json();
 
-      return res.ok;
     } catch (err) {
-      console.error("Blynk write failed", err);
-      return false;
+
+      console.error(err);
+
+      return {
+        success: false
+      };
+
     }
+
   }
 
+  
   // ---------------------------------------------------------------
   // Lampu
   // ---------------------------------------------------------------
@@ -42,18 +51,66 @@
     const states = switches.map(() => false);
     const masterText = $("lampMasterText");
 
+    const lampIds = [
+      "ruang_tamu",
+      "kamar",
+      "dapur",
+      "teras"
+    ];
+
     async function setLamp(i, on) {
+
       states[i] = on;
       setSwitch(switches[i], on);
-      masterText.textContent = states.some(Boolean) ? "MENYALA" : "OFF";
-      await blynkWrite(pins[i], on ? 1 : 0);
-    }
+
+      masterText.textContent =
+        states.some(Boolean) ? "MENYALA" : "OFF";
+
+      await deviceCommand("lamp", {
+        lampId: lampIds[i],
+        state: on ? "on" : "off"
+      });
+
+    } 
 
     switches.forEach((el, i) =>
       el.addEventListener("click", () => setLamp(i, !states[i])),
     );
-    bind("lampMasterOn", () => states.forEach((_, i) => setLamp(i, true)));
-    bind("lampMasterOff", () => states.forEach((_, i) => setLamp(i, false)));
+
+    bind("lampMasterOn", async () => {
+      await deviceCommand(
+        "all_lamps",
+        {
+          state: "on"
+        }
+      );
+
+      states.forEach((_, i) => {
+        states[i] = true;
+        setSwitch(switches[i], true);
+      });
+
+      masterText.textContent = "MENYALA";
+
+    });
+
+    bind("lampMasterOff", async () => {
+
+      await deviceCommand(
+        "all_lamps",
+        {
+          state: "off"
+        }
+      );
+
+      states.forEach((_, i) => {
+        states[i] = false;
+        setSwitch(switches[i], false);
+      });
+
+      masterText.textContent = "OFF";
+
+    });
 
     // Jadwal: hanya tampilan, belum dijalankan oleh ESP/Blynk.
     const days = [...document.querySelectorAll(".day")];
@@ -206,7 +263,16 @@
       waterBtn.classList.toggle("danger", waterOn);
       $("waterState").textContent = waterOn ? "ON (UI)" : "OFF";
 
-      const ok = await blynkWrite(PINS.waterCannon, waterOn ? 1 : 0);
+      const result = await deviceCommand(
+        "lamp",
+        {
+          lampId: "water_cannon",
+          state: waterOn ? "on" : "off"
+        }
+      );
+
+      const ok = result.success;
+
       if (PINS.waterCannon && !ok)
         $("waterState").textContent = "Gagal mengirim perintah";
     });
