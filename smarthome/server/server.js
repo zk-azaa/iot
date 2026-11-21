@@ -3,8 +3,7 @@ import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
+
 import { createClient } from "@supabase/supabase-js";
 
 import { runAgent } from "./agent.js";
@@ -81,17 +80,6 @@ app.use((req, res, next) => {
   console.log("REQ:", req.method, req.url);
   next();
 });
-
-// ==============================
-// FOLDER PUBLIC
-// ==============================
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Jika server.js berada di folder utama smarthome
-// dan public berada di dalam folder smarthome:
-app.use(express.static(path.join(__dirname, "../public")));
 
 // ==============================
 // API CONFIG
@@ -211,10 +199,10 @@ app.post("/api/device", verifyUser, async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("");
-  console.log("🏠 Smart Home Server berjalan!");
-  console.log(`Server listening on port ${PORT}`);
-  console.log(`🌐 Buka: http://localhost:${PORT}`);
-  console.log("");
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server berjalan di port ${PORT}`);
+  });
+}
+
+export default app;
