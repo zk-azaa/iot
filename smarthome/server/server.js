@@ -1,12 +1,14 @@
+
 import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
 import path from "path";
-
 import { fileURLToPath } from "url";
+import { createClient } from "@supabase/supabase-js";
 
 import { runAgent } from "./agent.js";
+
 import {
   controlLamp,
   controlAllLamps,
@@ -15,23 +17,53 @@ import {
   getHomeStatus
 } from "./tools.js";
 
-
 const app = express();
 
-app.use((req, res, next) => {
-    console.log("REQ:", req.method, req.url);
+// ==============================
+// SUPABASE AUTHENTICATION
+// ==============================
 
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type");
+const supabaseAuth = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(200);
+// Middleware untuk memeriksa login
+async function verifyUser(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Silakan login terlebih dahulu."
+      });
     }
 
-    next();
-});
+    const token = authHeader.substring(7);
 
+    const { data, error } = await supabaseAuth.auth.getUser(token);
+
+    if (error || !data.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Session tidak valid. Silakan login kembali."
+      });
+    }
+
+    req.user = data.user;
+
+    next();
+
+  } catch (error) {
+    console.error("Auth error:", error);
+
+    return res.status(401).json({
+      success: false,
+      message: "Gagal memverifikasi autentikasi."
+    });
+  }
+}
 
 // ==============================
 // MIDDLEWARE
@@ -40,95 +72,85 @@ app.use((req, res, next) => {
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log("REQ:", req.method, req.url);
+  next();
+});
 
 // ==============================
-// MENENTUKAN FOLDER PUBLIC
+// FOLDER PUBLIC
 // ==============================
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-// Menampilkan dashboard dari folder public
- app.use(
-     express.static(
-         path.join(__dirname, "../public")
-     )
-);
-
+// Jika server.js berada di folder utama smarthome
+// dan public berada di dalam folder smarthome:
+app.use(express.static(path.join(__dirname, "../public")));
 
 // ==============================
-// API AI AGENT
+// API CONFIG
 // ==============================
 
-app.post("/api/agent", async (req, res) => {
-
-    try {
-
-        const { 
-            message,
-            history = []
-         } = req.body;
-
-
-        // Cek pesan
-        if (!message) {
-
-            return res.status(400).json({
-                success: false,
-                error: "Instruksi tidak boleh kosong."
-            });
-
-        }
-
-
-        console.log("📩 Instruksi:", message);
-
-
-        // Kirim instruksi ke AI Agent
-        const reply = await runAgent(
-            message,
-            history
-        );
-
-
-        // Kirim hasil kembali ke dashboard
-        res.json({
-            success: true,
-            reply: reply
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "❌ Terjadi error pada AI Agent:",
-            error
-        );
-
-
-        res.status(500).json({
-            success: false,
-            error: "Terjadi kesalahan pada AI Agent."
-        });
-
-    }
-
+app.get("/api/config", (req, res) => {
+  res.json({
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY
+  });
 });
 
 // ==============================
-// API DEVICE
+// API AI AGENT (WAJIB LOGIN)
 // ==============================
 
-app.post("/api/device", async (req, res) => {
-
+app.post("/api/agent", verifyUser, async (req, res) => {
   try {
+    const {
+      message,
+      history = []
+    } = req.body;
 
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        error: "Instruksi tidak boleh kosong."
+      });
+    }
+
+    console.log("📩 Instruksi:", message);
+    console.log("👤 User:", req.user.email);
+
+    const reply = await runAgent(message, history);
+
+    return res.json({
+      success: true,
+      reply: reply
+    });
+
+  } catch (error) {
+    console.error("❌ Terjadi error pada AI Agent:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Terjadi kesalahan pada AI Agent."
+    });
+  }
+});
+
+// ==============================
+// API DEVICE (WAJIB LOGIN)
+// ==============================
+
+app.post("/api/device", verifyUser, async (req, res) => {
+  try {
     const { type } = req.body;
+
+    console.log("👤 Device request dari:", req.user.email);
 
     switch (type) {
 
@@ -164,29 +186,23 @@ app.post("/api/device", async (req, res) => {
         );
 
       case "status":
-        return res.json(
-          getHomeStatus()
-        );
+        return res.json(getHomeStatus());
 
       default:
         return res.status(400).json({
           success: false,
           message: "Perintah tidak dikenal."
         });
-
     }
 
   } catch (error) {
-
     console.error(error);
 
     return res.status(500).json({
       success: false,
       message: error.message
     });
-
   }
-
 });
 
 // ==============================
@@ -195,14 +211,10 @@ app.post("/api/device", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT,"0.0.0.0",() => {
-
-    console.log("");
-    console.log("🏠 Smart Home Server berjalan!");
-    console.log(`server listening on 0.0.0.0:${PORT}`);
-    console.log(
-        `🌐 Buka: http://localhost:${PORT}`
-    );
-    console.log("");
-
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("");
+  console.log("🏠 Smart Home Server berjalan!");
+  console.log(`Server listening on port ${PORT}`);
+  console.log(`🌐 Buka: http://localhost:${PORT}`);
+  console.log("");
 });

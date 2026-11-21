@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#171a18">
+  <title>Sign In | Smart Home AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <section class="login-visual" aria-label="Interior rumah modern">
+      <div class="visual-overlay"></div>
+      <div class="visual-copy">
+        <span class="eyebrow"><span class="live-dot"></span> INTELLIGENT LIVING</span>
+        <h1>Your home.<br>One intelligent system.</h1>
+        <p>Comfort, security, and control — connected in one place.</p>
+      </div>
+      <div class="visual-credit">SMART HOME · AI POWERED</div>
+    </section>
+
+    <section class="login-panel">
+      <div class="login-content">
+        <div class="brand-mark" aria-hidden="true"><span>⌂</span></div>
+        <div class="brand-name">Smart Home <span>AI</span></div>
+        <p class="welcome">Welcome back</p>
+        <h2>Sign In To Continue</h2>
+        <p class="intro">Enter your credentials to access your home dashboard.</p>
+
+        <form id="loginForm" class="login-form">
+          <label for="email">Email Address</label>
+          <div class="field-wrap">
+            <span class="field-icon" aria-hidden="true">✉</span>
+            <input id="email" name="email" type="email" placeholder="example@email.com" autocomplete="username" required>
+          </div>
+
+          <label for="password">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon lock" aria-hidden="true">♙</span>
+            <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+            <button class="toggle-password" type="button" id="togglePassword" aria-label="Tampilkan password">◉</button>
+          </div>
+
+          <div class="form-meta">
+            <label class="remember"><input type="checkbox" id="remember" checked><span>Remember Me</span></label>
+          </div>
+
+          <p id="loginMessage" class="form-message" role="alert" aria-live="polite"></p>
+          <button class="submit-button" type="submit" id="signInButton">
+            <span>Sign In</span><span class="submit-arrow">↗</span>
+          </button>
+        </form>
+        <p class="secure-note"><span>●</span> Secure access protected by Supabase</p>
+      </div>
+      <footer>© 2026 Smart Home AI. All rights reserved.</footer>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
