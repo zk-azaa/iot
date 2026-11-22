@@ -17,6 +17,10 @@ import { createClient } from "@supabase/supabase-js";
 //   controlWaterCannon,
 //   getHomeStatus
 // } from "./tools.js";
+console.log("SERVER START");
+console.log("SUPABASE_URL =", process.env.SUPABASE_URL);
+console.log("SUPABASE_ANON_KEY =", !!process.env.SUPABASE_ANON_KEY);
+console.log("GROQ_API_KEY =", !!process.env.GROQ_API_KEY);
 
 const app = express();
 
