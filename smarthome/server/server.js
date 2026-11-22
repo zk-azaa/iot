@@ -1,6 +1,11 @@
 
 import "dotenv/config";
 
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, "../public")));
+
 import express from "express";
 import cors from "cors";
 
