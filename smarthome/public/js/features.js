@@ -217,10 +217,13 @@
       knob.style.transform = `translate(${((x - 90) / 90) * RADIUS}px,${((90 - y) / 90) * RADIUS}px)`;
 
       const now = Date.now();
-      if (send && now - lastSent > SEND_INTERVAL_MS) {
+          if (send && now - lastSent > SEND_INTERVAL_MS) {
         lastSent = now;
-        blynkWrite(PINS.waterCannonServoX || "V4", Math.round(x));
-        blynkWrite(PINS.waterCannonServoY || "V5", Math.round(y));
+
+        deviceCommand("cannon", {
+          x: Math.round(x),
+          y: Math.round(y)
+        });
       }
     }
 
