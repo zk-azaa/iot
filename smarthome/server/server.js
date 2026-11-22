@@ -38,10 +38,22 @@ app.use(
 // SUPABASE AUTHENTICATION
 // ==============================
 
-const supabaseAuth = createClient(
-  process.env.SUPABASE_URL,
+// const supabaseAuth = createClient(
+//   process.env.SUPABASE_URL,
+//   process.env.SUPABASE_ANON_KEY
+// );
+
+let supabaseAuth = null;
+
+if (
+  process.env.SUPABASE_URL &&
   process.env.SUPABASE_ANON_KEY
-);
+) {
+  supabaseAuth = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+  );
+}
 
 // Middleware untuk memeriksa login
 async function verifyUser(req, res, next) {
