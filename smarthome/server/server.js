@@ -8,15 +8,15 @@ import { fileURLToPath } from "url";
 
 import { createClient } from "@supabase/supabase-js";
 
-import { runAgent } from "./agent.js";
+// import { runAgent } from "./agent.js";
 
-import {
-  controlLamp,
-  controlAllLamps,
-  controlServo,
-  controlWaterCannon,
-  getHomeStatus
-} from "./tools.js";
+// import {
+//   controlLamp,
+//   controlAllLamps,
+//   controlServo,
+//   controlWaterCannon,
+//   getHomeStatus
+// } from "./tools.js";
 
 const app = express();
 
