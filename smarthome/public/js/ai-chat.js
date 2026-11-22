@@ -315,14 +315,19 @@
       // jika belum aktif
       // jika belum aktif
 if (!afnaAwake) {
+  const wakewords = [
+    "afna",
+    "asna",
+    "asma"
+  ]
 
     if (lowerText.includes("afna")) {
 
       wakeAfna();
 
-      // hanya bilang "afna"
+    
       if (
-        lowerText.trim() === "afna"
+        wakewords.includes(lowerText.trim())
       ) {
 
         speak(
@@ -334,7 +339,7 @@ if (!afnaAwake) {
 
       // ada perintah setelah kata afna
       transcript = transcript
-        .replace(/afna/gi, "")
+        .replace(/(afna|asna|asma)/gi, "")
         .trim();
 
     } else {
