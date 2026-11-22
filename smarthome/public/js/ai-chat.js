@@ -157,19 +157,21 @@
 
     const voices = speechSynthesis.getVoices();
 
-    selectedVoice =
-        voices.find(v =>
-          v.name.includes("Google Bahasa Indonesia")
-        )
-    || voices.find(v =>
-          v.name.includes("Female")
-        )
-    || voices.find(v =>
-          v.name.includes("Zira")
-        )
-    || voices[0];
+    selectedVoice = voices.find(
+      v => v.name === "Google Bahasa Indonesia"
+    );
 
-    
+    if (!selectedVoice) {
+      console.warn(
+        "Google Bahasa Indonesia tidak ditemukan"
+      );
+      selectedVoice = voices[0];
+    }
+
+    console.log(
+      "VOICE:",
+      selectedVoice?.name
+    );
   }
 
   // browser kadang lambat load voice
