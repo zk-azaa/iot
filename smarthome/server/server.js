@@ -93,6 +93,17 @@ app.use((req, res, next) => {
   next();
 });
 
+
+// TEST VERCEL ENV
+app.get("/api/test", (req, res) => {
+  res.json({
+    node: process.version,
+    supabase: !!process.env.SUPABASE_URL,
+    anon: !!process.env.SUPABASE_ANON_KEY,
+    groq: !!process.env.GROQ_API_KEY
+  });
+});
+
 // ==============================
 // API CONFIG
 // ==============================
