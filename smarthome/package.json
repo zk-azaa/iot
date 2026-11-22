@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "engines": {
-      "node": ">=22.0.0"
-    },
+    "node": ">=22.0.0"
+  },
   "description": "",
   "main": "server/server.js",
   "scripts": {
@@ -19,6 +19,7 @@
     "dotenv": "^18.0.9",
     "express": "^5.3.0",
     "express-rate-limit": "^7.4.0",
+    "grammy": "^1.48.0",
     "groq-sdk": "^1.6.0",
     "openai": "^7.53.0"
   }

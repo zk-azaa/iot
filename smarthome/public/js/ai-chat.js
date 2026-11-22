@@ -318,7 +318,8 @@ if (!afnaAwake) {
   const wakewords = [
     "afna",
     "asna",
-    "asma"
+    "asma",
+    "afnan"
   ]
 
     if (lowerText.includes("afna")) {
@@ -339,7 +340,7 @@ if (!afnaAwake) {
 
       // ada perintah setelah kata afna
       transcript = transcript
-        .replace(/(afna|asna|asma)/gi, "")
+        .replace(/(afna|asna|asma|afnan)/gi, "")
         .trim();
 
     } else {
