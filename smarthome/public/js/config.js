@@ -12,10 +12,10 @@ window.SMART_HOME_CONFIG = {
 
   // URL stream kamera (kosong = belum diatur).
   CAMERAS: {
-    waterCannon: "http://192.168.1.14/stream",
-    cctv1: "http://192.168.1.14/stream",
+    waterCannon: "http://192.168.1.23/stream",
+    cctv1: "",
     cctv2: "",
     cctv3: "",
-    cctv4: "http://192.168.1.14/stream",
+    cctv4: "",
   },
 };
