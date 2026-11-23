@@ -1,4 +1,9 @@
 <!doctype html>
+<script>
+if (!localStorage.getItem("access_token")) {
+  location.href = "/login.html";
+}
+</script>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />

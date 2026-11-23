@@ -1,5 +1,5 @@
 import { Bot } from "grammy";
-import { runAgent } from "./agent.js";
+import { runAgent } from "../../server/agent.js";
 
 const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
