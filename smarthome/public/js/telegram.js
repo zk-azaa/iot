@@ -35,6 +35,6 @@ bot.on("message:text", async (ctx) => {
 
 });
 
-//bot.start();
+bot.start();
 
 console.log("✅ Telegram aktif");

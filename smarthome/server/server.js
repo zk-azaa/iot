@@ -1,5 +1,5 @@
 import "dotenv/config";
-//import "../public/js/telegram.js"
+import "../public/js/telegram.js"
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -15,7 +15,7 @@ import {
   getHomeStatus
 } from "./tools.js";
 
-// import { supabase } from "./supabase.js";
+import { supabase } from "./supabase.js";
 
 const app = express();
 
