@@ -314,42 +314,34 @@
 
       // jika belum aktif
       // jika belum aktif
-if (!afnaAwake) {
-  const wakewords = [
-    "afna",
-    "asna",
-    "asma",
-    "afnan"
-  ]
+      if (!afnaAwake) {
 
-    if (lowerText.includes("afna")) {
+        const wakewords = [
+          "afna",
+          "asna",
+          "asma",
+          "afnan"
+        ];
 
-      wakeAfna();
+        if (wakewords.some(word => lowerText.includes(word))) {
 
-    
-      if (
-        wakewords.includes(lowerText.trim())
-      ) {
+            wakeAfna();
 
-        speak(
-          "Ya boss, ada yang bisa afna bantu?"
-        );
+            if (wakewords.includes(lowerText.trim())) {
 
-        return;
+              speak("Ya boss, ada yang bisa afna bantu?");
+              return;
+            }
+
+            transcript = transcript
+              .replace(/(afna|asna|asma|afnan)/gi, "")
+              .trim();
+
+          } else {
+
+            return;
+          }
       }
-
-      // ada perintah setelah kata afna
-      transcript = transcript
-        .replace(/(afna|asna|asma|afnan)/gi, "")
-        .trim();
-
-    } else {
-
-      return;
-
-    }
-  }
-
       // jika sudah aktif
       wakeAfna();
 

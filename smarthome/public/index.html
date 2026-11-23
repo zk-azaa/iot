@@ -1,4 +1,9 @@
 <!doctype html>
+<script>
+if (!localStorage.getItem("access_token")) {
+  location.href = "/login.html";
+}
+</script>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -74,8 +79,8 @@
             >
               <span class="option-icon">↪</span>
               <span
-                ><strong>Log Out</strong><small>Keluar dari akun</small></span
-              >
+                ><strong>Log Out</strong><small>Keluar dari akun</small>
+              </span>
             </button>
           </div>
         </div>

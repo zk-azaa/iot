@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
+  <title>Login | Smart Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/login.css">  
+</head>
+<body>
+  <div class="ambient"></div>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M5 22.5 24 6l19 16.5M10 20v22h28V20M20 42V28h8v14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div><div class="brand-name">Smart Home</div><div class="brand-sub">Control · Monitor · Automate</div></div>
+    </div>
+    <div class="secure"><span class="secure-dot"></span> Secure access</div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="eyebrow">Your home, intelligently connected</div>
+      <h1>Selamat Datang di<br><span>Smart Home!</span></h1>
+      <p>Kelola rumah pintar Anda dalam satu kendali. Pantau perangkat, atur keamanan, dan nikmati kenyamanan dari mana saja.</p>
+      <div class="feature-row">
+        <div class="feature"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18h6m-5 3h4m-2-20a7 7 0 0 0-4 12.75c.6.4 1 1.05 1 1.75h6c0-.7.4-1.35 1-1.75A7 7 0 0 0 12 1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Smart lighting</div>
+        <div class="feature"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 5 6v5c0 4.6 3 8 7 10 4-2 7-5.4 7-10V6l-7-3Z" stroke="currentColor" stroke-width="1.6"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Home security</div>
+        <div class="feature"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18m-7-7 7 7 7-7M5 7l7-4 7 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Remote control</div>
+      </div>
+    </section>
+
+    <section class="login-card">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 3 10v11h6v-7h6v7h6V10l-9-7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M17 5h3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      <h2>Masuk ke akun</h2>
+      <p class="card-desc">Silakan masuk untuk mengakses dan mengontrol perangkat Smart Home Anda.</p>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input-wrap"><input id="email" name="email" type="email" placeholder="nama@email.com" autocomplete="username" required></div>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <input class="password-input" id="password" name="password" type="password" placeholder="Masukkan password" autocomplete="current-password" required minlength="6">
+            <button class="toggle-pass" id="togglePassword" type="button" aria-label="Tampilkan password">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-meta">
+          <label class="remember"><input type="checkbox" id="remember" checked> Ingat saya</label>
+
+        </div>
+        <button class="submit-btn" id="loginButton" type="submit"><span id="buttonText">Masuk ke Dashboard</span><span aria-hidden="true">→</span></button>
+        <div id="loginMessage" class="message" role="status" aria-live="polite"></div>
+      </form>
+      <div class="card-footer">Protected access · <span>Smart Home System</span></div>
+    </section>
+  </main>
+
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

@@ -46,9 +46,17 @@
   // Titik integrasi autentikasi (Supabase/Firebase/dll).
   logout?.addEventListener("click", () => {
     if (!window.confirm("Yakin ingin keluar dari akun?")) return;
-    window.alert(
-      "Tombol Log Out sudah siap. Hubungkan ke sistem autentikasi saat fitur login ditambahkan.",
-    );
     setMenu(false);
+  });
+
+  document
+  .getElementById("logoutButton")
+    .addEventListener("click", () => {
+
+      localStorage.removeItem(
+        "access_token"
+      );
+
+      location.href = "/login.html";
   });
 })();

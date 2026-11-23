@@ -6,7 +6,7 @@ import {
     controlAllLamps,
     getHomeStatus,
     controlServo,
-    controlWaterCannon
+    
 } from "./tools.js";
 
 
