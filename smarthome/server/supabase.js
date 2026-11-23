@@ -1,3 +1,5 @@
+console.log("URL =", SUPABASE_URL);
+console.log("KEY =", !!SUPABASE_ANON_KEY);
 import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
