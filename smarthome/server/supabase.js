@@ -4,6 +4,9 @@ export const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY,
   {
+    realtime: {
+      enabled: false
+    },
     auth: {
       persistSession: false,
       autoRefreshToken: false
