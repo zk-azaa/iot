@@ -1,40 +1,50 @@
+
 import { Bot } from "grammy";
 import { runAgent } from "./agent.js";
 
-const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
+const token = process.env.TELEGRAM_BOT_TOKEN;
 
-bot.command("start", async (ctx) => {
-  await ctx.reply(
-    "Halo Boss 👋 Afna siap membantu."
-  );
-});
+// Jangan crash jika token belum tersedia
+if (!token) {
+  console.warn("⚠️ Telegram dinonaktifkan: token belum tersedia.");
+} else {
+  const bot = new Bot(token);
 
-bot.on("message:text", async (ctx) => {
+  bot.command("start", async (ctx) => {
+    await ctx.reply("Halo Boss 👋 Afna siap membantu.");
+  });
 
-  try {
+  bot.on("message:text", async (ctx) => {
+    try {
+      const text = ctx.message.text;
 
-    const text = ctx.message.text;
+      console.log("📩 Telegram:", text);
 
-    console.log("📩 Telegram:", text);
+      const reply = await runAgent(text);
 
-    const reply = await runAgent(text);
+      await ctx.reply(
+        reply || "Afna tidak menemukan jawaban."
+      );
 
-    await ctx.reply(
-      reply || "Afna tidak menemukan jawaban."
-    );
+    } catch (err) {
+      console.error("Telegram error:", err);
 
-  } catch (err) {
+      await ctx.reply(
+        "Maaf Boss, Afna sedang mengalami gangguan."
+      );
+    }
+  });
 
-    console.error(err);
+  // Polling hanya untuk server lokal.
+  // Vercel menggunakan serverless dan tidak cocok
+  // untuk polling Telegram yang berjalan terus-menerus.
+  if (!process.env.VERCEL) {
+    bot.start().catch((err) => {
+      console.error("Telegram polling error:", err);
+    });
 
-    await ctx.reply(
-      "Maaf Boss, Afna sedang error."
-    );
-
+    console.log("✅ Telegram aktif");
+  } else {
+    console.log("ℹ️ Telegram polling tidak dijalankan di Vercel.");
   }
-
-});
-
-bot.start();
-
-console.log("✅ Telegram aktif");
+}

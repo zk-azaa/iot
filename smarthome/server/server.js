@@ -1,9 +1,8 @@
+
 import "dotenv/config";
-import "./telegram.js"
 import express from "express";
 import cors from "cors";
 import path from "path";
-
 import { fileURLToPath } from "url";
 
 import { runAgent } from "./agent.js";
@@ -16,6 +15,9 @@ import {
 } from "./tools.js";
 
 import { supabase } from "./supabase.js";
+
+// JANGAN import telegram.js di sini
+
 
 const app = express();
 
@@ -208,16 +210,16 @@ app.post("/api/device", async (req, res) => {
 
     }
 
-  } catch (error) {
 
-    console.error(error);
+    } catch (error) {
+        console.error("❌ Error AI Agent:", error);
 
-    return res.status(500).json({
-      success: false,
-      message: error.message
-    });
+        res.status(500).json({
+            success: false,
+            error: error.message || "Terjadi kesalahan pada AI Agent."
+        });
+    }
 
-  }
 
 });
 

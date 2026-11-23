@@ -18,6 +18,10 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
+if (!process.env.GROQ_API_KEY) {
+  throw new Error("GROQ_API_KEY belum dikonfigurasi di Vercel.");
+}
+
 console.log(
   "GROQ KEY:",
   process.env.GROQ_API_KEY ? "ADA" : "KOSONG"
