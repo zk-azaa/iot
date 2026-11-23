@@ -15,7 +15,7 @@ import {
   getHomeStatus
 } from "./tools.js";
 
-import { supabase } from "./supabase.js";
+//import { supabase } from "./supabase.js";
 
 const app = express();
 

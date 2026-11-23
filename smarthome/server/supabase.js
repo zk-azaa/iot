@@ -3,15 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
-console.log("SUPABASE_URL:", SUPABASE_URL);
-console.log("SUPABASE_KEY ADA:", !!SUPABASE_ANON_KEY);
+console.log("URL:", SUPABASE_URL);
+console.log("KEY ADA:", !!SUPABASE_ANON_KEY);
 
-if (!SUPABASE_URL) {
-  throw new Error("SUPABASE_URL tidak ditemukan");
-}
-
-if (!SUPABASE_ANON_KEY) {
-  throw new Error("SUPABASE_ANON_KEY tidak ditemukan");
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error("Supabase ENV tidak ditemukan");
 }
 
 export const supabase = createClient(
