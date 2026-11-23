@@ -15,7 +15,7 @@ import {
   getHomeStatus
 } from "./tools.js";
 
-import { supabase } from "./supabase.js";
+// import { supabase } from "./supabase.js";
 
 const app = express();
 
@@ -46,36 +46,36 @@ app.use(cors({
 app.use(express.json());
 
 
-app.post("/api/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// app.post("/api/login", async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
 
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+//     const { data, error } =
+//       await supabase.auth.signInWithPassword({
+//         email,
+//         password,
+//       });
 
-    if (error) {
-      return res.status(401).json({
-        success: false,
-        message: error.message,
-      });
-    }
+//     if (error) {
+//       return res.status(401).json({
+//         success: false,
+//         message: error.message,
+//       });
+//     }
 
-    res.json({
-      success: true,
-      access_token: data.session.access_token,
-      user: data.user,
-    });
+//     res.json({
+//       success: true,
+//       access_token: data.session.access_token,
+//       user: data.user,
+//     });
 
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
+//   } catch (err) {
+//     res.status(500).json({
+//       success: false,
+//       message: err.message,
+//     });
+//   }
+// });
 
 // ==============================
 // MENENTUKAN FOLDER PUBLIC
