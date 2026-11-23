@@ -1,7 +1,7 @@
 import { Bot } from "grammy";
 import { runAgent } from "./agent.js";
 
-//const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
+const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
 bot.command("start", async (ctx) => {
   await ctx.reply(
@@ -35,6 +35,6 @@ bot.on("message:text", async (ctx) => {
 
 });
 
-//bot.start();
+bot.start();
 
 console.log("✅ Telegram aktif");
