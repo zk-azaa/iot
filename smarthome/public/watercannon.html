@@ -5,43 +5,7 @@ if (!localStorage.getItem("access_token")) {
 }
 </script>
 
-<script>
-  (function () {
-    const box = document.getElementById("cannonCamera");
-    const status = document.querySelector(".status");
-    const hint = document.querySelector(".hint");
-    const url = window.SMART_HOME_CONFIG.CAMERAS.waterCannon;
-    if (!box || !url) return;
 
-    if (getComputedStyle(box).position === "static") {
-      box.style.position = "relative";
-    }
-
-    const img = document.createElement("img");
-    img.alt = "Kamera Water Cannon";
-    img.style.cssText =
-      "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0";
-
-    // label & crosshair tetap di atas video
-    box.querySelectorAll(".camlabel, .crosshair").forEach((el) => {
-      el.style.position = el.style.position || "relative";
-      el.style.zIndex = "1";
-    });
-
-    img.onload = () => {
-      if (status) status.textContent = "● LIVE";
-      const label = box.querySelector(".camlabel");
-      if (label) label.textContent = "LIVE";
-      if (hint) hint.style.display = "none";
-    };
-    img.onerror = () => {
-      if (status) status.textContent = "● Stream tidak tersedia";
-    };
-
-    img.src = window.camUrl(url);
-    box.prepend(img);
-  })();
-</script>
 
 <html lang="id">
   <head>
@@ -146,5 +110,43 @@ if (!localStorage.getItem("access_token")) {
     <script src="js/config.js"></script>
     <script src="js/features.js"></script>
     <script src="js/ai-chat.js"></script>
+
+    <script>
+      (function () {
+        const box = document.getElementById("cannonCamera");
+        const status = document.querySelector(".status");
+        const hint = document.querySelector(".hint");
+        const url = window.SMART_HOME_CONFIG.CAMERAS.waterCannon;
+        if (!box || !url) return;
+
+        if (getComputedStyle(box).position === "static") {
+          box.style.position = "relative";
+        }
+
+        const img = document.createElement("img");
+        img.alt = "Kamera Water Cannon";
+        img.style.cssText =
+          "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0";
+
+        // label & crosshair tetap di atas video
+        box.querySelectorAll(".camlabel, .crosshair").forEach((el) => {
+          el.style.position = el.style.position || "relative";
+          el.style.zIndex = "1";
+        });
+
+        img.onload = () => {
+          if (status) status.textContent = "● LIVE";
+          const label = box.querySelector(".camlabel");
+          if (label) label.textContent = "LIVE";
+          if (hint) hint.style.display = "none";
+        };
+        img.onerror = () => {
+          if (status) status.textContent = "● Stream tidak tersedia";
+        };
+
+        img.src = window.camUrl(url);
+        box.prepend(img);
+      })();
+    </script>
   </body>
 </html>

@@ -4,31 +4,6 @@ if (!localStorage.getItem("access_token")) {
   location.href = "/login.html";
 }
 </script>
-
-<script>
-  (function () {
-    const keys = ["cctv1", "cctv2", "cctv3", "cctv4"];
-    const tiles = document.querySelectorAll("#cctvGrid .cctv-tile");
-
-    keys.forEach((key, i) => {
-      const url = window.SMART_HOME_CONFIG.CAMERAS[key];
-      if (!url || !tiles[i]) return; // belum ada URL, biarkan placeholder
-
-      const img = document.createElement("img");
-      img.alt = key;
-      img.src = window.camUrl(url);
-      img.style.cssText =
-        "width:100%;height:100%;object-fit:cover;display:block";
-      img.onerror = () => {
-        tiles[i].textContent = "Stream tidak tersedia";
-      };
-
-      tiles[i].innerHTML = "";
-      tiles[i].appendChild(img);
-    });
-  })();
-</script>
-
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -101,5 +76,29 @@ if (!localStorage.getItem("access_token")) {
     <script src="js/config.js"></script>
     <script src="js/features.js"></script>
     <script src="js/ai-chat.js"></script>
+    <script>
+      (function () {
+        const keys = ["cctv1", "cctv2", "cctv3", "cctv4"];
+        const tiles = document.querySelectorAll("#cctvGrid .cctv-tile");
+
+        keys.forEach((key, i) => {
+          const url = window.SMART_HOME_CONFIG.CAMERAS[key];
+          if (!url || !tiles[i]) return; // belum ada URL, biarkan placeholder
+
+          const img = document.createElement("img");
+          img.alt = key;
+          img.src = window.camUrl(url);
+          img.style.cssText =
+            "width:100%;height:100%;object-fit:cover;display:block";
+          img.onerror = () => {
+            tiles[i].textContent = "Stream tidak tersedia";
+          };
+
+          tiles[i].innerHTML = "";
+          tiles[i].appendChild(img);
+        });
+      })();
+    </script>
+
   </body>
 </html>
