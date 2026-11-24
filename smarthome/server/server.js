@@ -228,15 +228,6 @@ app.post("/api/device", async (req, res) => {
 // PROXY KAMERA (CCTV)
 // ==============================
 
-const CAMERA_URLS = {
-  waterCannon: "http://192.168.137.11/stream",
-  cctv1: "http://192.168.137.11/stream", // opsional, kalau mau tampil juga di halaman CCTV
-  // cctv2: "http://192.168.137.12/stream",
-  // cctv3: "http://192.168.137.13/stream",
-  // cctv4: "http://192.168.137.14/stream",
-};
-
-// Cek token login Supabase
 async function requireAuth(req, res, next) {
   const token = req.query.token;
   if (!token) return res.status(401).end();
@@ -247,17 +238,42 @@ async function requireAuth(req, res, next) {
   next();
 }
 
+const camFrames = {};
+const camClients = {};
+
+function writeFrame(client, buf) {
+  client.write(
+    `--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${buf.length}\r\n\r\n`
+  );
+  client.write(buf);
+  client.write("\r\n");
+}
+
+// ESP32-CAM mengirim frame ke sini
+app.post(
+  "/api/cam-upload/:id",
+  express.raw({ type: "image/jpeg", limit: "2mb" }),
+  (req, res) => {
+    if (req.headers["x-cam-key"] !== process.env.CAM_KEY) {
+      return res.status(401).end();
+    }
+    const id = req.params.id;
+    camFrames[id] = req.body;
+    for (const c of camClients[id] || []) writeFrame(c, req.body);
+    res.sendStatus(200);
+  }
+);
+
+// Browser menonton di sini
 app.get("/cam/:id", requireAuth, (req, res) => {
-  const target = CAMERA_URLS[req.params.id];
-  if (!target) return res.status(404).end();
-
-  const up = http.get(target, (r) => {
-    res.writeHead(200, { "Content-Type": r.headers["content-type"] });
-    r.pipe(res);
+  const id = req.params.id;
+  res.writeHead(200, {
+    "Content-Type": "multipart/x-mixed-replace; boundary=frame",
+    "Cache-Control": "no-cache",
   });
-
-  up.on("error", () => res.end());
-  req.on("close", () => up.destroy());
+  (camClients[id] ||= new Set()).add(res);
+  if (camFrames[id]) writeFrame(res, camFrames[id]);
+  req.on("close", () => camClients[id].delete(res));
 });
 
 // ==============================
