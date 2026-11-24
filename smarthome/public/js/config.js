@@ -1,21 +1,24 @@
-// Konfigurasi sisi browser — HANYA data non-rahasia.
-// Token Blynk dan API key Groq ada di file .env (dibaca server.js), bukan di sini.
 window.SMART_HOME_CONFIG = {
-  // Mapping virtual pin Blynk. null = belum ada mapping (kontrol hanya simulasi UI).
   PINS: {
-    lampu: ["V0", "V1", null, null], // Ruang tamu, kamar, dapur, teras
+    lampu: ["V0", "V1", null, null],
     pompaTangki: null,
     waterCannon: null,
     waterCannonServoX: "V4",
     waterCannonServoY: "V5",
   },
 
-
   CAMERAS: {
-    waterCannon: "http://192.168.137.11/stream",
+    waterCannon: "/cam/waterCannon",
     cctv1: "",
     cctv2: "",
     cctv3: "",
     cctv4: "",
   },
+};
+
+// Tambahkan token login ke URL kamera (tag <img> tidak bisa kirim header)
+window.camUrl = function (path) {
+  if (!path) return "";
+  const token = localStorage.getItem("access_token") || "";
+  return `${path}?token=${encodeURIComponent(token)}`;
 };
