@@ -68,7 +68,12 @@
   }
 
   function renderAuto(data) {
-    autoOn = data.auto === null || data.auto === undefined ? null : data.auto === true;
+    autoOn =
+    data.auto === null || data.auto === undefined
+      ? null
+      : data.auto === true ||
+        data.auto === 1 ||
+        data.auto === "1";
     autoBtn.setAttribute("aria-checked", String(autoOn === true));
     autoBtn.classList.toggle("on", autoOn === true);
 
@@ -170,9 +175,10 @@
         Number.isFinite(data.low) ? data.low : 20,
         Number.isFinite(data.high) ? data.high : 90,
       );
-      const pumpOn = data.pump === true;
-      pumpStatus.textContent =
-        data.pump === null ? "Tidak diketahui" : pumpOn ? "ON" : "OFF";
+     const pumpOn =
+      data.pump === true ||
+      data.pump === 1 ||
+      data.pump === "1";
       setPumpButtons({ enabled: true, on: pumpOn });
       setAutoControls(true);
       renderAuto(data);
