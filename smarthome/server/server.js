@@ -49,37 +49,6 @@ app.use(cors({
 app.use(express.json());
 
 
-app.post("/api/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-    if (error) {
-      return res.status(401).json({
-        success: false,
-        message: error.message,
-      });
-    }
-
-    res.json({
-      success: true,
-      access_token: data.session.access_token,
-      user: data.user,
-    });
-
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
-
 // ==============================
 // MENENTUKAN FOLDER PUBLIC
 // ==============================
@@ -224,6 +193,8 @@ app.post("/api/device", async (req, res) => {
 
 });
 
+
+
 // ==============================
 // PROXY KAMERA (CCTV)
 // ==============================
@@ -279,6 +250,9 @@ app.get("/cam/:id", requireAuth, (req, res) => {
 // ==============================
 // MENJALANKAN SERVER
 // ==============================
+
+import tankRoutes from "./tank-routes.js";
+app.use("/api/tank", tankRoutes);
 
 const PORT = process.env.PORT || 3000;
 

@@ -139,62 +139,84 @@
     });
   }
 
-  // ---------------------------------------------------------------
-  // Water tank (simulasi sampai pin sensor/relay dikonfigurasi)
-  // ---------------------------------------------------------------
-  function initTank() {
-    const slider = $("tankLevel");
-    const autoSwitch = $("tankAuto");
-    const autoStatus = $("tankAutoStatus");
-    let pumpOn = false;
+  // // ---------------------------------------------------------------
+  // // Water tank (simulasi sampai pin sensor/relay dikonfigurasi)
+  // // ---------------------------------------------------------------
+  // function initTank() {
+  //   const slider = $("tankLevel");
+  //   const autoSwitch = $("tankAuto");
+  //   const autoStatus = $("tankAutoStatus");
+  //   let pumpOn = false;
 
-    function setPump(on) {
-      pumpOn = on;
-      $("pumpStatus").textContent = on ? "ON (simulasi)" : "OFF";
-      $("pumpOn").classList.toggle("active", on);
-      $("pumpOff").classList.toggle("active", !on);
-    }
+  //   async function refreshTank() {
 
-    function runAutomation() {
-      const level = Number(slider.value);
-      const low = Number($("tankLow").value);
-      const high = Number($("tankHigh").value);
+  //     const res = await fetch("/api/tank");
+  //     const data = await res.json();
 
-      if (low >= high) {
-        autoStatus.textContent =
-          "Batas minimum harus lebih kecil dari batas maksimum.";
-        return;
-      }
-      if (level <= low) setPump(true);
-      else if (level >= high) setPump(false);
-      autoStatus.textContent = `Otomatisasi simulasi: pompa ${pumpOn ? "ON" : "OFF"}.`;
-    }
+  //     const v = data.level;
 
-    function updateTank() {
-      const v = Number(slider.value);
-      $("tankPercent").textContent = `${v}%`;
-      $("tankLiters").textContent = `${Math.round(v * 10)} L / 1.000 L`;
-      $("tankRing").style.background =
-        `conic-gradient(#39baff 0 ${v}%,#2a3c56 ${v}% 100%)`;
-      $("tankStatus").textContent =
-        v < 20 ? "Rendah" : v > 90 ? "Penuh" : "Normal";
-      if (isOn(autoSwitch)) runAutomation();
-    }
+  //     $("tankPercent").textContent = `${v}%`;
 
-    slider.addEventListener("input", updateTank);
-    bind("pumpOn", () => setPump(true));
-    bind("pumpOff", () => setPump(false));
-    bind("tankAuto", () => {
-      const on = !isOn(autoSwitch);
-      setSwitch(autoSwitch, on);
-      autoStatus.textContent = on
-        ? "Otomatisasi simulasi aktif."
-        : "Otomatisasi nonaktif.";
-      if (on) runAutomation();
-    });
+  //     $("tankLiters").textContent =
+  //         `${Math.round(v * 10)} L / 1.000 L`;
 
-    updateTank();
-  }
+  //     $("tankRing").style.background =
+  //         `conic-gradient(#39baff 0 ${v}%, #2a3c56 ${v}% 100%)`;
+
+  //     $("tankStatus").textContent =
+  //         v < 20 ? "Rendah" :
+  //         v > 90 ? "Penuh" :
+  //         "Normal";
+  //   }
+
+  //   function setPump(on) {
+  //     pumpOn = on;
+  //     $("pumpStatus").textContent = on ? "ON (simulasi)" : "OFF";
+  //     $("pumpOn").classList.toggle("active", on);
+  //     $("pumpOff").classList.toggle("active", !on);
+  //   }
+
+  //   function runAutomation() {
+  //     const level = Number(slider.value);
+  //     const low = Number($("tankLow").value);
+  //     const high = Number($("tankHigh").value);
+
+  //     if (low >= high) {
+  //       autoStatus.textContent =
+  //         "Batas minimum harus lebih kecil dari batas maksimum.";
+  //       return;
+  //     }
+  //     if (level <= low) setPump(true);
+  //     else if (level >= high) setPump(false);
+  //     autoStatus.textContent = `Otomatisasi simulasi: pompa ${pumpOn ? "ON" : "OFF"}.`;
+  //   }
+
+  //   function updateTank() {
+  //     const v = Number(slider.value);
+  //     $("tankPercent").textContent = `${v}%`;
+  //     $("tankLiters").textContent = `${Math.round(v * 10)} L / 1.000 L`;
+  //     $("tankRing").style.background =
+  //       `conic-gradient(#39baff 0 ${v}%,#2a3c56 ${v}% 100%)`;
+  //     $("tankStatus").textContent =
+  //       v < 20 ? "Rendah" : v > 90 ? "Penuh" : "Normal";
+  //     if (isOn(autoSwitch)) runAutomation();
+  //   }
+
+  //   slider.addEventListener("input", updateTank);
+  //   bind("pumpOn", () => setPump(true));
+  //   bind("pumpOff", () => setPump(false));
+  //   bind("tankAuto", () => {
+  //     const on = !isOn(autoSwitch);
+  //     setSwitch(autoSwitch, on);
+  //     autoStatus.textContent = on
+  //       ? "Otomatisasi simulasi aktif."
+  //       : "Otomatisasi nonaktif.";
+  //     if (on) runAutomation();
+  //   });
+
+  //   refreshTank();
+  //   setInterval(refreshTank, 2000);
+  // }
 
   // ---------------------------------------------------------------
   // Water cannon: joystick -> servo X/Y
@@ -368,7 +390,7 @@
 
   // ---------- Jalankan sesuai halaman ----------
   if ($("lampList")) initLamps();
-  if ($("tankLevel")) initTank();
+  // if ($("tankLevel")) initTank();
   if ($("joystick")) initCannon();
   if ($("cctvLayout")) initCctv();
   if ($("accessGrid")) initAccess();

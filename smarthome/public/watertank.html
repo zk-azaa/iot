@@ -1,9 +1,4 @@
 <!doctype html>
-<script>
-if (!localStorage.getItem("access_token")) {
-  location.href = "/login.html";
-}
-</script>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -32,11 +27,11 @@ if (!localStorage.getItem("access_token")) {
       <section class="grid">
         <article class="panel">
           <h2>Monitoring Tangki</h2>
-          <p class="muted">Contoh tampilan level tangki (simulasi).</p>
+          <p class="muted" id="tankConn">Menghubungkan...</p>
           <div class="tank-ring" id="tankRing">
             <div>
-              <strong id="tankPercent">72%</strong
-              ><small id="tankLiters">720 L / 1.000 L</small>
+              <strong id="tankPercent">--</strong
+              ><small id="tankLiters">Menghubungkan...</small>
             </div>
           </div>
           <input
@@ -44,12 +39,12 @@ if (!localStorage.getItem("access_token")) {
             type="range"
             min="0"
             max="100"
-            value="72"
+            value="0"
             id="tankLevel"
           />
           <div class="row">
             <span class="muted">Kosong</span
-            ><b id="tankStatus" class="status">Normal</b
+            ><b id="tankStatus" class="status">--</b
             ><span class="muted">Penuh</span>
           </div>
         </article>
@@ -58,7 +53,7 @@ if (!localStorage.getItem("access_token")) {
           <div class="row">
             <div>
               <b>Pompa air</b>
-              <p class="muted" id="pumpStatus">OFF</p>
+              <p class="muted" id="pumpStatus">--</p>
             </div>
             <div class="row">
               <button class="btn primary" id="pumpOn">ON</button
@@ -69,7 +64,9 @@ if (!localStorage.getItem("access_token")) {
           <div class="row">
             <div>
               <b>Otomatisasi</b>
-              <p class="muted">Kontrol pompa berdasarkan level air.</p>
+              <p class="muted">
+                Pompa diatur oleh Arduino Mega berdasarkan level air.
+              </p>
             </div>
             <button
               class="switch"
@@ -83,20 +80,24 @@ if (!localStorage.getItem("access_token")) {
             <input
               id="tankLow"
               type="number"
-              min="1"
-              max="99"
+              min="5"
+              max="85"
+              step="1"
               value="20" /></label
           ><label
             >Batas mati pompa (%)
-            <input id="tankHigh" type="number" min="2" max="100" value="90"
+            <input id="tankHigh" type="number" min="15" max="95" step="1" value="90"
           /></label>
-          <p class="muted" id="tankAutoStatus">Otomatisasi nonaktif.</p>
+          <button class="btn primary" id="tankSave">Simpan batas</button>
+          <p class="muted" id="tankAutoStatus">Menghubungkan...</p>
         </article>
       </section>
       <p class="note" style="margin-top: 16px">
-        Level tangki saat ini adalah simulasi karena file project belum berisi
-        konfigurasi sensor ultrasonik atau pin Blynk untuk pompa. Jangan gunakan
-        simulasi ini sebagai pembacaan level air nyata.
+        Level, status pompa, dan batas otomatis dibaca dari perangkat asli
+        (sensor ultrasonik → Arduino Mega → ESP32 → Blynk). Batas otomatis
+        disimpan di Arduino Mega dan hanya dianggap berhasil setelah perangkat
+        mengonfirmasinya. Pompa selalu berhenti sendiri di level 98% atau
+        setelah 10 menit menyala terus, apa pun pengaturannya.
       </p>
       <p class="muted" style="text-align: center; margin: 24px 0 5px">
         Smart Home Dashboard · Halaman fitur terpisah
@@ -104,6 +105,7 @@ if (!localStorage.getItem("access_token")) {
     </main>
     <script src="js/config.js"></script>
     <script src="js/features.js"></script>
+    <script src="js/tank.js"></script>
     <script src="js/ai-chat.js"></script>
   </body>
 </html>
