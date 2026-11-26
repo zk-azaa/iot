@@ -50,6 +50,52 @@ app.use(express.json());
 
 
 // ==============================
+// API LOGIN SUPABASE
+// ==============================
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email dan password wajib diisi."
+      });
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      return res.status(401).json({
+        success: false,
+        message: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Login berhasil",
+      access_token: data.session.access_token,
+      user: data.user
+    });
+
+  } catch (error) {
+    console.error("Login error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada server."
+    });
+  }
+});
+
+
+
+// ==============================
 // MENENTUKAN FOLDER PUBLIC
 // ==============================
 
