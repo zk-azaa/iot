@@ -300,6 +300,9 @@ app.get("/cam/:id", requireAuth, (req, res) => {
 import tankRoutes from "./tank-routes.js";
 app.use("/api/tank", tankRoutes);
 
+import accessRoutes from "./acces-routes.js";
+app.use("/api/access", accessRoutes);
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT,"0.0.0.0",() => {

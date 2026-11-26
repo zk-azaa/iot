@@ -5,10 +5,10 @@ window.SMART_HOME_CONFIG = {
 
     // Water Tank dikontrol melalui API server,
     // bukan langsung dari browser.
-    pompaTangki: V6,
-    autoPompa: V8,
-    levelTangki: V7,
-    batasPompa: V9,
+    pompaTangki: "V6",
+    autoPompa: "V8",
+    levelTangki: "V7",
+    batasPompa: "V9",
 
     waterCannon: null,
     waterCannonServoX: "V4",
