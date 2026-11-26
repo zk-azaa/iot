@@ -27,36 +27,36 @@ if (!localStorage.getItem("access_token")) {
           <h1>🔐 Akses Rumah</h1>
           <p>Kelola kunci gerbang dan pintu serta status akses RFID.</p>
         </div>
-        <span class="pill">Mode dashboard</span>
+        <span class="pill" id="accessPill">Menghubungkan…</span>
       </div>
       <section class="panel">
         <div class="row">
           <div>
             <h2>Kontrol Pintu & Gerbang</h2>
-            <p class="muted">Status di bawah adalah simulasi antarmuka.</p>
+            <p class="muted">Status mengikuti kondisi perangkat (ESP dan Arduino Mega).</p>
           </div>
-          <span class="status">● Dashboard siap</span>
+          <span class="status" id="deviceStatus">● Menghubungkan…</span>
         </div>
         <div class="access-grid" id="accessGrid" style="margin-top: 16px">
-          <div class="access-card" data-door="Gerbang Depan">
+          <div class="access-card" data-door="Gerbang Depan" data-door-id="gerbang_depan">
             <div style="font-size: 26px">🚧</div>
             <h3>Gerbang Depan</h3>
             <p class="lockstate">TERKUNCI</p>
             <button class="btn primary lock-btn">UNLOCK</button>
           </div>
-          <div class="access-card" data-door="Pintu Utama">
+          <div class="access-card" data-door="Pintu Utama" data-door-id="pintu_utama">
             <div style="font-size: 26px">🚪</div>
             <h3>Pintu Utama</h3>
             <p class="lockstate">TERKUNCI</p>
             <button class="btn primary lock-btn">UNLOCK</button>
           </div>
-          <div class="access-card" data-door="Pintu Kamar">
+          <div class="access-card" data-door="Pintu Kamar" data-door-id="pintu_kamar">
             <div style="font-size: 26px">🚪</div>
             <h3>Pintu Kamar</h3>
             <p class="lockstate">TERKUNCI</p>
             <button class="btn primary lock-btn">UNLOCK</button>
           </div>
-          <div class="access-card" data-door="Pintu Belakang">
+          <div class="access-card" data-door="Pintu Belakang" data-door-id="pintu_belakang">
             <div style="font-size: 26px">🚪</div>
             <h3>Pintu Belakang</h3>
             <p class="lockstate">TERKUNCI</p>
@@ -79,23 +79,24 @@ if (!localStorage.getItem("access_token")) {
             ></button>
           </div>
           <p id="rfidModeText" class="status" style="margin-top: 14px">
-            RFID diblokir oleh mode kunci.
+            Memuat status RFID…
           </p>
         </article>
         <article class="panel">
-          <h2>Riwayat Akses (Demo)</h2>
-          <p class="muted" id="accessLog">Belum ada aktivitas pada sesi ini.</p>
+          <h2>Riwayat Akses</h2>
+          <p class="muted" id="accessLog" style="white-space: pre-line">Belum ada aktivitas.</p>
           <div class="formrow">
-            <button class="btn" id="rfidTest">Simulasikan scan RFID</button
+            <button class="btn" id="rfidTest">Segarkan status</button
             ><button class="btn danger" id="lockAll">LOCK SEMUA</button>
           </div>
         </article>
       </section>
       <p class="note" style="margin-top: 16px">
-        Penting: tombol LOCK pada halaman ini hanya mengubah status antarmuka.
-        Integrasi kunci elektrik/solenoid dan pembaca RFID belum ada pada source
-        yang diunggah. Pastikan selalu ada mekanisme keluar darurat secara
-        manual dan jangan mengunci jalur evakuasi.
+        Penting: Pintu Utama memakai relay dan Gerbang Depan memakai servo.
+        Pintu Kamar dan Pintu Belakang masih berupa LED simulasi. Kartu RFID
+        hanya diproses saat Mode Kunci RFID dimatikan. Pastikan selalu ada
+        mekanisme keluar darurat secara manual dan jangan mengunci jalur
+        evakuasi.
       </p>
       <p class="muted" style="text-align: center; margin: 24px 0 5px">
         Smart Home Dashboard · Halaman fitur terpisah

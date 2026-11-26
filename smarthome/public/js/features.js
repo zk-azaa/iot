@@ -338,54 +338,172 @@
   }
 
   // ---------------------------------------------------------------
-  // Akses & RFID (simulasi UI; mode kunci RFID menolak scan)
+  // Akses & RFID (terhubung ke ESP + Arduino Mega lewat /api/access)
   // ---------------------------------------------------------------
   function initAccess() {
+    const POLL_MS = 3000;
+    const cards = [...document.querySelectorAll(".access-card")];
+    let online = false;
+
     const log = (text) => ($("accessLog").textContent = text);
+
+    async function accessApi(path, body) {
+      const token = localStorage.getItem("access_token") || "";
+      const response = await fetch(`/api/access${path}`, {
+        method: body ? "POST" : "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(body ? { "Content-Type": "application/json" } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+
+      if (response.status === 401) {
+        localStorage.removeItem("access_token");
+        location.href = "/login.html";
+        throw new Error("Sesi berakhir, silakan login ulang.");
+      }
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Permintaan gagal.");
+      }
+
+      return data;
+    }
 
     function renderLock(card, locked) {
       const btn = card.querySelector(".lock-btn");
       card.querySelector(".lockstate").textContent = locked
         ? "TERKUNCI"
-        : "TERBUKA (UI)";
+        : "TERBUKA";
       btn.textContent = locked ? "UNLOCK" : "LOCK";
       btn.classList.toggle("danger", !locked);
       btn.classList.toggle("primary", locked);
     }
 
-    document.querySelectorAll(".lock-btn").forEach((btn) =>
-      btn.addEventListener("click", () => {
-        const card = btn.closest(".access-card");
-        const willUnlock = btn.textContent === "UNLOCK";
-        renderLock(card, !willUnlock);
-        log(
-          `${card.dataset.door}: ${willUnlock ? "dibuka" : "dikunci"} pada sesi ini.`,
-        );
-      }),
-    );
+    function renderOffline(reason) {
+      const text =
+        reason === "mega" ? "Arduino Mega tidak merespons" : "Perangkat offline";
+      $("accessPill").textContent = text;
+      $("deviceStatus").textContent = `● ${text}`;
+      cards.forEach((card) => {
+        card.querySelector(".lockstate").textContent = "TIDAK TERHUBUNG";
+        card.querySelector(".lock-btn").disabled = true;
+      });
+      $("rfidModeText").textContent = "Status RFID tidak diketahui.";
+    }
 
-    bind("rfidLockMode", () => {
-      const on = !isOn($("rfidLockMode"));
-      setSwitch($("rfidLockMode"), on);
-      $("rfidModeText").textContent = on
-        ? "RFID diblokir oleh mode kunci."
-        : "RFID diizinkan (simulasi).";
+    function renderHistory(history = []) {
+      if (!history.length) {
+        log("Belum ada aktivitas.");
+        return;
+      }
+
+      log(
+        history
+          .slice(0, 6)
+          .map((item) => {
+            const time = item.at
+              ? new Date(item.at).toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })
+              : "--:--:--";
+            return `${time} · ${item.text}`;
+          })
+          .join("\n"),
+      );
+    }
+
+    function render(data) {
+      online = data.online;
+      renderHistory(data.history);
+
+      if (!online) {
+        renderOffline(data.reason);
+        return;
+      }
+
+      $("accessPill").textContent = "Terhubung";
+      $("deviceStatus").textContent = "● Perangkat online";
+
+      cards.forEach((card) => {
+        card.querySelector(".lock-btn").disabled = false;
+        renderLock(card, !data.doors[card.dataset.doorId]);
+      });
+
+      if (data.rfidBlocked !== null) {
+        setSwitch($("rfidLockMode"), data.rfidBlocked);
+        $("rfidModeText").textContent = data.rfidBlocked
+          ? "RFID diblokir oleh mode kunci."
+          : "RFID diizinkan, kartu terdaftar bisa membuka akses.";
+      }
+    }
+
+    async function refresh() {
+      try {
+        render(await accessApi(""));
+      } catch (err) {
+        console.error(err);
+        $("accessPill").textContent = "Server error";
+        $("deviceStatus").textContent = "● Gagal membaca status";
+      }
+    }
+
+    // Kirim perintah, lalu baca status asli dari perangkat (bukan menebak di UI)
+    async function send(path, body, pendingText) {
+      log(pendingText);
+      try {
+        await accessApi(path, body);
+        setTimeout(refresh, 1200);
+      } catch (err) {
+        log(err.message);
+      }
+    }
+
+    cards.forEach((card) => {
+      const btn = card.querySelector(".lock-btn");
+
+      btn.addEventListener("click", async () => {
+        if (!online) return;
+
+        const willUnlock = btn.textContent === "UNLOCK";
+        btn.disabled = true;
+
+        await send(
+          "/door",
+          { door: card.dataset.doorId, open: willUnlock },
+          `${card.dataset.door}: mengirim perintah ${willUnlock ? "buka" : "kunci"}…`,
+        );
+      });
     });
 
-    bind("rfidTest", () => {
-      log(
-        isOn($("rfidLockMode"))
-          ? "Scan ditolak: mode kunci RFID aktif."
-          : "Scan diterima: akses simulasi diberikan.",
+    bind("rfidLockMode", () => {
+      if (!online) return;
+
+      const blocked = !isOn($("rfidLockMode"));
+      send(
+        "/rfid-mode",
+        { blocked },
+        "Mengubah mode kunci RFID…",
       );
     });
 
+    bind("rfidTest", refresh);
+
     bind("lockAll", () => {
-      document
-        .querySelectorAll(".access-card")
-        .forEach((card) => renderLock(card, true));
-      log("Semua pintu dan gerbang ditandai terkunci (UI).");
+      if (!online) return;
+
+      send("/lock-all", {}, "Mengirim perintah kunci semua…");
     });
+
+    refresh();
+    setInterval(() => {
+      if (!document.hidden) refresh();
+    }, POLL_MS);
   }
 
   // ---------- Jalankan sesuai halaman ----------
