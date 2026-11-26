@@ -1,7 +1,15 @@
+
 window.SMART_HOME_CONFIG = {
   PINS: {
     lampu: ["V0", "V1", null, null],
-    pompaTangki: null,
+
+    // Water Tank dikontrol melalui API server,
+    // bukan langsung dari browser.
+    pompaTangki: V6,
+    autoPompa: V8,
+    levelTangki: V7,
+    batasPompa: V9,
+
     waterCannon: null,
     waterCannonServoX: "V4",
     waterCannonServoY: "V5",
@@ -16,9 +24,10 @@ window.SMART_HOME_CONFIG = {
   },
 };
 
-// Tambahkan token login ke URL kamera (tag <img> tidak bisa kirim header)
+// URL kamera dengan token autentikasi
 window.camUrl = function (path) {
   if (!path) return "";
+
   const token = localStorage.getItem("access_token") || "";
   return `${path}?token=${encodeURIComponent(token)}`;
 };
