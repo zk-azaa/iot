@@ -16,6 +16,7 @@ import {
 } from "./tools.js";
 
 import { supabase } from "./supabase.js";
+import { getUserFromRequest } from "./auth.js";
 
 // JANGAN import telegram.js di sini
 
@@ -121,7 +122,8 @@ app.post("/api/agent", async (req, res) => {
 
         const { 
             message,
-            history = []
+            history = [],
+            source
          } = req.body;
 
 
@@ -140,9 +142,17 @@ app.post("/api/agent", async (req, res) => {
 
 
         // Kirim instruksi ke AI Agent
+        // Kontrol pintu/gerbang hanya untuk pengguna yang login (token Supabase)
+        const user = await getUserFromRequest(req);
+
         const reply = await runAgent(
             message,
-            history
+            history,
+            {
+                userKey: user ? `web:${user.id}` : "anonim",
+                canControlAccess: Boolean(user),
+                source: source === "voice" ? "voice" : "text"
+            }
         );
 
 
@@ -303,9 +313,16 @@ app.use("/api/tank", tankRoutes);
 import accessRoutes from "./acces-routes.js";
 app.use("/api/access", accessRoutes);
 
+import alertsRoutes from "./alerts.js";
+app.use("/api/alerts", alertsRoutes);
+
+import { startTankMonitor } from "./tank-monitor.js";
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT,"0.0.0.0",() => {
+
+    startTankMonitor();
 
     console.log("");
     console.log("🏠 Smart Home Server berjalan!");

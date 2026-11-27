@@ -22,9 +22,6 @@
       <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
       <form class="chat-form" id="chatForm">
         <input id="chatInput" type="text" placeholder="Ketik pesan..." autocomplete="off" aria-label="Ketik pesan untuk AI">
-        <button class="mic-button" id="voiceButton" type="button" aria-label="Input suara" title="Input suara">
-          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg>
-        </button>
         <button class="send-button" type="submit" aria-label="Kirim pesan">
           <svg viewBox="0 0 24 24"><path d="m4 4 17 8-17 8 3-8-3-8Zm3 8h14"/></svg>
         </button>
@@ -141,6 +138,18 @@
       }));
   }
 
+
+  // Token login dikirim agar server tahu pengguna sudah login
+  // (dibutuhkan untuk kontrol pintu dan gerbang lewat Afna).
+  function authHeaders(extra = {}) {
+    let token = "";
+    try {
+      token = localStorage.getItem("access_token") || "";
+    } catch {
+      /* abaikan */
+    }
+    return token ? { ...extra, Authorization: `Bearer ${token}` } : extra;
+  }
 
   let isSpeaking = false;
   let afnaAwake = false;
@@ -260,8 +269,12 @@
     try {
       const res = await fetch("/api/agent", { //http://localhost:3000/api/agent
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, history: contextForServer() }),
+        headers: authHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({
+          message,
+          history: contextForServer(),
+          source: "text",
+        }),
       });
       const data = await res.json().catch(() => ({}));
       typing.remove();
@@ -361,12 +374,13 @@
           "/api/agent",//http://localhost:3000/api/agent
           {
             method: "POST",
-            headers: {
+            headers: authHeaders({
               "Content-Type":"application/json"
-            },
+            }),
             body: JSON.stringify({
               message: transcript,
-              history: contextForServer()
+              history: contextForServer(),
+              source: "voice"
             })
           }
         );
@@ -406,31 +420,10 @@
     recognition.addEventListener("error", (e) => {
       voiceNote.textContent = `Input suara bermasalah: ${e.error}`;
     });
-    recognition.addEventListener("end", () => {
-      voiceButton.classList.remove("listening");
-      if (!isSpeaking) {
-        try {
-          recognition.start();
-        } catch {}
-      }
-    });
+ 
   } else {
     voiceButton.title = "Input suara tidak didukung browser ini";
   }
-
-  voiceButton.addEventListener("click", () => {
-    if (!recognition) {
-      voiceNote.textContent =
-        "Browser ini belum mendukung input suara. Coba Chrome atau Edge.";
-      return;
-    }
-    try {
-      voiceNote.textContent = "";
-      recognition.start();
-    } catch {
-      voiceNote.textContent = "Mikrofon sedang digunakan atau belum siap.";
-    }
-  });
 
   window.addEventListener("load", () => {
     if (!recognition) return;
@@ -441,4 +434,45 @@
     }, 1000);
 
   });
+  // ---------- Peringatan dari Afna (air tangki hampir habis / penuh, dll) ----------
+  // Server memantau tangki terus-menerus. Peringatan baru muncul sebagai pesan Afna,
+  // panel chat dibuka, dan dibacakan dengan suara.
+  const ALERT_SEEN_KEY = "smarthome_ai_alert_seen_v1";
+  const ALERT_POLL_MS = 15000;
+  const ALERT_FIRST_LOOKBACK_MS = 30 * 60 * 1000;
+
+  async function pollAlerts() {
+    const headers = authHeaders();
+    if (!headers.Authorization) return;
+
+    let seen = Number(store.read(ALERT_SEEN_KEY, 0)) || 0;
+    if (!seen) seen = Date.now() - ALERT_FIRST_LOOKBACK_MS;
+
+    try {
+      const res = await fetch(`/api/alerts?after=${seen}`, { headers });
+      if (!res.ok) return;
+
+      const data = await res.json();
+
+      for (const alert of data.alerts || []) {
+        renderMessage(String(alert.text ?? ""), "bot");
+        setMode("open");
+        try {
+          speak(String(alert.text ?? ""));
+        } catch {
+          /* suara tidak tersedia */
+        }
+        seen = Math.max(seen, alert.id);
+      }
+
+      if (seen) store.write(ALERT_SEEN_KEY, seen);
+    } catch {
+      /* server belum bisa dihubungi, coba lagi nanti */
+    }
+  }
+
+  pollAlerts();
+  setInterval(() => {
+    if (!document.hidden) pollAlerts();
+  }, ALERT_POLL_MS);
 })();

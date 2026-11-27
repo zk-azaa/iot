@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { supabase } from "./supabase.js";
+import { requireUser } from "./auth.js";
 
 const router = Router();
 
@@ -25,6 +25,8 @@ const DOORS = {
   pintu_belakang: { pin: "V13", name: "Pintu Belakang" }
 };
 
+export const ACCESS_DOORS = DOORS;
+
 const MODE_PIN = "V14";
 const EVENT_PIN = "V15";
 const MEGA_PIN = "V16";
@@ -35,13 +37,23 @@ const RESULT_TEXT = {
   TIDAK_DIKENAL: "ditolak, kartu tidak dikenal"
 };
 
-// ========================================
-// HELPER
-// ========================================
+// Siapa yang mengirim perintah (untuk riwayat akses)
+const SOURCE_LABEL = {
+  dashboard: "dari dashboard",
+  afna: "lewat Afna"
+};
 
-function fail(res, status, error) {
-  return res.status(status).json({ success: false, error });
+// Error dengan kode HTTP, dipakai route maupun tool AI
+export class AccessError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+  }
 }
+
+// ========================================
+// HELPER BLYNK
+// ========================================
 
 async function blynk(endpoint) {
   const response = await fetch(`${BLYNK_API}/${endpoint}`, {
@@ -49,8 +61,10 @@ async function blynk(endpoint) {
   });
 
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`Blynk HTTP ${response.status}: ${detail}`);
+    const detail = (await response.text()).slice(0, 160);
+    // label tanpa token, supaya aman ditampilkan: contoh "get?V16"
+    const label = endpoint.replace(/token=[^&]*&?/, "").replace(/[?&]$/, "");
+    throw new Error(`Blynk HTTP ${response.status} pada ${label}: ${detail}`);
   }
 
   return (await response.text()).trim();
@@ -75,6 +89,12 @@ const writePin = (pin, value) =>
     `update?token=${encodeURIComponent(getToken())}&${pin}=${encodeURIComponent(value)}`
   );
 
+function requireToken() {
+  if (!getToken()) {
+    throw new AccessError(500, "BLYNK_TOKEN belum diatur di .env");
+  }
+}
+
 // ESP harus online di Blynk dan Arduino Mega harus mengirim heartbeat ke ESP
 async function deviceStatus() {
   const esp =
@@ -87,31 +107,6 @@ async function deviceStatus() {
 
   return mega ? { online: true } : { online: false, reason: "mega" };
 }
-
-// ========================================
-// AUTENTIKASI (token login Supabase dari dashboard)
-// ========================================
-
-async function requireUser(req, res, next) {
-  const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
-
-  if (!token) return fail(res, 401, "Belum login.");
-
-  try {
-    const { data, error } = await supabase.auth.getUser(token);
-
-    if (error || !data?.user) return fail(res, 401, "Sesi tidak valid.");
-
-    req.user = data.user;
-    next();
-  } catch (err) {
-    console.error("[ACCESS AUTH]", err.message);
-    return fail(res, 401, "Sesi tidak valid.");
-  }
-}
-
-router.use(requireUser);
 
 // ========================================
 // RIWAYAT AKSES (disimpan di memori server)
@@ -152,28 +147,19 @@ function trackRfidEvent(raw) {
 }
 
 // ========================================
-// GET /api/access
+// FUNGSI BERSAMA (dipakai route dan tool AI Afna)
 // ========================================
 
-router.get("/", async (req, res) => {
-  res.set("Cache-Control", "no-store");
-
-  if (!getToken()) {
-    return fail(res, 500, "BLYNK_TOKEN belum diatur di .env");
-  }
+// Membaca status asli dari perangkat.
+// Hasil: { online:false, reason } atau { online:true, doors, rfidBlocked }
+export async function readAccessStatus() {
+  requireToken();
 
   try {
     const status = await deviceStatus();
 
     // Perangkat offline: nilai di cloud bisa sudah basi, jangan ditampilkan sebagai status
-    if (!status.online) {
-      return res.json({
-        success: true,
-        online: false,
-        reason: status.reason,
-        history
-      });
-    }
+    if (!status.online) return status;
 
     const ids = Object.keys(DOORS);
 
@@ -190,149 +176,167 @@ router.get("/", async (req, res) => {
       doors[id] = toBool(doorRaw[i]) === true;
     });
 
-    return res.json({
-      success: true,
-      online: true,
-      doors,
-      rfidBlocked: toBool(modeRaw),
-      history
-    });
+    return { online: true, doors, rfidBlocked: toBool(modeRaw) };
   } catch (err) {
-    console.error("[ACCESS GET]", err.message);
-    return fail(res, 502, "Gagal membaca data dari Blynk.");
-  }
-});
-
-// ========================================
-// Pastikan ESP online sebelum mengirim perintah
-// ========================================
-
-async function ensureOnline(res) {
-  try {
-    const status = await deviceStatus();
-
-    if (!status.online) {
-      fail(
-        res,
-        503,
-        status.reason === "mega"
-          ? "Arduino Mega tidak merespons."
-          : "Perangkat akses (ESP) sedang offline."
-      );
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error("[ACCESS ONLINE]", err.message);
-    fail(res, 502, "Gagal menghubungi Blynk.");
-    return false;
+    console.error("[ACCESS READ]", err.message);
+    throw new AccessError(502, `Gagal membaca data dari Blynk. ${err.message}`);
   }
 }
 
-// ========================================
-// POST /api/access/door   { door, open }
-// ========================================
+// Pastikan ESP dan Mega hidup sebelum mengirim perintah
+async function ensureOnline() {
+  requireToken();
 
-router.post("/door", async (req, res) => {
-  if (!getToken()) {
-    return fail(res, 500, "BLYNK_TOKEN belum diatur di .env");
-  }
-
-  const { door, open } = req.body || {};
-  const target = DOORS[door];
-
-  if (!target) return fail(res, 400, "Pintu tidak dikenal.");
-  if (typeof open !== "boolean") {
-    return fail(res, 400, "Field open harus true atau false.");
-  }
-
-  if (!(await ensureOnline(res))) return;
+  let status;
 
   try {
-    await writePin(target.pin, open ? 1 : 0);
-
-    console.log("[ACCESS DOOR]", target.name, open ? "UNLOCK" : "LOCK", "by", req.user.email);
-
-    pushHistory({
-      source: "dashboard",
-      at: new Date().toISOString(),
-      door: target.name,
-      text: `${target.name} ${open ? "dibuka" : "dikunci"} dari dashboard`
-    });
-
-    return res.json({ success: true, door, open });
+    status = await deviceStatus();
   } catch (err) {
-    console.error("[ACCESS DOOR]", err.message);
-    return fail(res, 502, "Gagal mengirim perintah pintu.");
-  }
-});
-
-// ========================================
-// POST /api/access/lock-all
-// ========================================
-
-router.post("/lock-all", async (req, res) => {
-  if (!getToken()) {
-    return fail(res, 500, "BLYNK_TOKEN belum diatur di .env");
+    console.error("[ACCESS ONLINE]", err.message);
+    throw new AccessError(502, "Gagal menghubungi Blynk.");
   }
 
-  if (!(await ensureOnline(res))) return;
+  if (!status.online) {
+    throw new AccessError(
+      503,
+      status.reason === "mega"
+        ? "Arduino Mega tidak merespons."
+        : "Perangkat akses (ESP) sedang offline."
+    );
+  }
+}
+
+async function writeOrFail(pin, value, failMessage) {
+  try {
+    await writePin(pin, value);
+  } catch (err) {
+    console.error("[ACCESS WRITE]", err.message);
+    throw new AccessError(502, failMessage);
+  }
+}
+
+export async function sendDoorCommand(door, open, source = "dashboard") {
+  const target = DOORS[door];
+
+  if (!target) throw new AccessError(400, "Pintu tidak dikenal.");
+  if (typeof open !== "boolean") {
+    throw new AccessError(400, "Field open harus true atau false.");
+  }
+
+  await ensureOnline();
+  await writeOrFail(target.pin, open ? 1 : 0, "Gagal mengirim perintah pintu.");
+
+  pushHistory({
+    source,
+    at: new Date().toISOString(),
+    door: target.name,
+    text: `${target.name} ${open ? "dibuka" : "dikunci"} ${SOURCE_LABEL[source] || ""}`.trim()
+  });
+
+  return { door, name: target.name, open };
+}
+
+export async function sendLockAll(source = "dashboard") {
+  await ensureOnline();
 
   try {
     await Promise.all(Object.values(DOORS).map((d) => writePin(d.pin, 0)));
-
-    console.log("[ACCESS LOCK ALL] by", req.user.email);
-
-    pushHistory({
-      source: "dashboard",
-      at: new Date().toISOString(),
-      door: "Semua",
-      text: "Semua pintu dan gerbang dikunci dari dashboard"
-    });
-
-    return res.json({ success: true });
   } catch (err) {
     console.error("[ACCESS LOCK ALL]", err.message);
-    return fail(res, 502, "Gagal mengirim perintah kunci semua.");
+    throw new AccessError(502, "Gagal mengirim perintah kunci semua.");
+  }
+
+  pushHistory({
+    source,
+    at: new Date().toISOString(),
+    door: "Semua",
+    text: `Semua pintu dan gerbang dikunci ${SOURCE_LABEL[source] || ""}`.trim()
+  });
+}
+
+export async function sendRfidMode(blocked, source = "dashboard") {
+  if (typeof blocked !== "boolean") {
+    throw new AccessError(400, "Field blocked harus true atau false.");
+  }
+
+  await ensureOnline();
+  await writeOrFail(MODE_PIN, blocked ? 1 : 0, "Gagal mengirim mode RFID.");
+
+  pushHistory({
+    source,
+    at: new Date().toISOString(),
+    door: "RFID",
+    text: blocked
+      ? `Mode kunci RFID diaktifkan ${SOURCE_LABEL[source] || ""}`.trim()
+      : `Mode kunci RFID dimatikan ${SOURCE_LABEL[source] || ""}, kartu boleh membuka akses`.trim()
+  });
+}
+
+// ========================================
+// ROUTE (wajib login)
+// ========================================
+
+router.use(requireUser);
+
+function handleError(res, err, fallback) {
+  if (err instanceof AccessError) {
+    return res.status(err.status).json({ success: false, error: err.message });
+  }
+
+  console.error("[ACCESS]", err);
+  return res.status(502).json({ success: false, error: fallback });
+}
+
+// GET /api/access
+router.get("/", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+
+  try {
+    const status = await readAccessStatus();
+    return res.json({ success: true, ...status, history });
+  } catch (err) {
+    return handleError(res, err, "Gagal membaca data dari Blynk.");
   }
 });
 
-// ========================================
-// POST /api/access/rfid-mode   { blocked }
-// ========================================
-
-router.post("/rfid-mode", async (req, res) => {
-  if (!getToken()) {
-    return fail(res, 500, "BLYNK_TOKEN belum diatur di .env");
-  }
-
-  const { blocked } = req.body || {};
-
-  if (typeof blocked !== "boolean") {
-    return fail(res, 400, "Field blocked harus true atau false.");
-  }
-
-  if (!(await ensureOnline(res))) return;
-
+// POST /api/access/door   { door, open }
+router.post("/door", async (req, res) => {
   try {
-    await writePin(MODE_PIN, blocked ? 1 : 0);
+    const { door, open } = req.body || {};
+    const result = await sendDoorCommand(door, open, "dashboard");
+
+    console.log("[ACCESS DOOR]", result.name, open ? "UNLOCK" : "LOCK", "by", req.user.email);
+
+    return res.json({ success: true, door, open });
+  } catch (err) {
+    return handleError(res, err, "Gagal mengirim perintah pintu.");
+  }
+});
+
+// POST /api/access/lock-all
+router.post("/lock-all", async (req, res) => {
+  try {
+    await sendLockAll("dashboard");
+
+    console.log("[ACCESS LOCK ALL] by", req.user.email);
+
+    return res.json({ success: true });
+  } catch (err) {
+    return handleError(res, err, "Gagal mengirim perintah kunci semua.");
+  }
+});
+
+// POST /api/access/rfid-mode   { blocked }
+router.post("/rfid-mode", async (req, res) => {
+  try {
+    const { blocked } = req.body || {};
+    await sendRfidMode(blocked, "dashboard");
 
     console.log("[ACCESS RFID MODE]", blocked ? "BLOCKED" : "ALLOWED", "by", req.user.email);
 
-    pushHistory({
-      source: "dashboard",
-      at: new Date().toISOString(),
-      door: "RFID",
-      text: blocked
-        ? "Mode kunci RFID diaktifkan"
-        : "Mode kunci RFID dimatikan, kartu boleh membuka akses"
-    });
-
     return res.json({ success: true, blocked });
   } catch (err) {
-    console.error("[ACCESS RFID MODE]", err.message);
-    return fail(res, 502, "Gagal mengirim mode RFID.");
+    return handleError(res, err, "Gagal mengirim mode RFID.");
   }
 });
 
